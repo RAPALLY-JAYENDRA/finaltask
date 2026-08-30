@@ -849,7 +849,7 @@ if "New Lead" in selected_nav or "Dashboard" in selected_nav:
     with st.expander("📋 Quick Paste & Auto-Fill Raw Lead Data", expanded=False):
         raw_paste_input = st.text_area(
             "Paste raw copied lead text (Tab-separated or Key-Value format)",
-            placeholder="Name\tJan Michael Cruz\nEmail\tJanMichael.Cruz@vertiv.com\nPhone\t+63 998 968 7032\nCompany\tVertiv\nCountry\tPH\nInterest\tOthers\nMessage\tHi, we are interested in data regarding permitting & land activities...",
+            placeholder="Paste raw copied lead data or key-value fields here...",
             height=95,
             key="raw_lead_paste_input"
         )
@@ -864,23 +864,23 @@ if "New Lead" in selected_nav or "Dashboard" in selected_nav:
     with st.form("lead_intake_form", clear_on_submit=False):
         r1_c1, r1_c2 = st.columns(2)
         with r1_c1:
-            in_name = st.text_input("Lead Full Name *", value=sample.get("name", ""), placeholder="e.g. Jan Michael Cruz")
+            in_name = st.text_input("Lead Full Name *", value=sample.get("name", ""), placeholder="Enter lead full name")
         with r1_c2:
-            in_company = st.text_input("Target Enterprise / Company *", value=sample.get("company", ""), placeholder="e.g. Vertiv")
+            in_company = st.text_input("Target Enterprise / Company *", value=sample.get("company", ""), placeholder="Enter company name")
 
         r2_c1, r2_c2 = st.columns(2)
         with r2_c1:
-            in_email = st.text_input("Business Email *", value=sample.get("email", ""), placeholder="e.g. JanMichael.Cruz@vertiv.com")
+            in_email = st.text_input("Business Email *", value=sample.get("email", ""), placeholder="name@company.com")
         with r2_c2:
-            in_website = st.text_input("Company Website Domain (Optional)", value=sample.get("website", ""), placeholder="e.g. https://www.vertiv.com")
+            in_website = st.text_input("Company Website Domain (Optional)", value=sample.get("website", ""), placeholder="https://www.company.com")
 
         r3_c1, r3_c2 = st.columns(2)
         with r3_c1:
-            in_phone = st.text_input("Phone Number", value=sample.get("phone", ""), placeholder="e.g. +63 998 968 7032")
+            in_phone = st.text_input("Phone Number", value=sample.get("phone", ""), placeholder="+1 (555) 000-0000")
         with r3_c2:
-            in_country = st.text_input("Country / Region", value=sample.get("country", "United States"), placeholder="e.g. PH")
+            in_country = st.text_input("Country / Region", value=sample.get("country", ""), placeholder="Country or Region code")
 
-        in_interests = st.text_input("Stated Interests / Referred Service", value=sample.get("interests", ""), placeholder="e.g. Others / Data Center Research")
+        in_interests = st.text_input("Stated Interests / Referred Service", value=sample.get("interests", ""), placeholder="Inquired research areas or service requirements")
 
         in_message = st.text_area(
             "Inbound Message / Inquired Requirements / Notes *",
