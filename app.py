@@ -314,29 +314,51 @@ a.anchor-link, [data-testid="stHeaderActionElements"] {
     font-weight: 700 !important;
 }
 
-/* Completely hide all radio circle inputs and indicator elements */
-[data-testid="stSidebar"] [data-testid="stRadio"] label > *:not([data-testid="stMarkdownContainer"]),
-[data-testid="stSidebar"] [data-testid="stRadio"] label > div:not([data-testid="stMarkdownContainer"]),
-[data-testid="stSidebar"] [data-testid="stRadio"] label input,
-[data-testid="stSidebar"] [data-testid="stRadio"] label div[aria-hidden="true"],
-[data-testid="stSidebar"] [data-testid="stRadio"] label div[data-baseweb="radio"],
-[data-testid="stSidebar"] [data-testid="stRadio"] label svg {
+/* Sidebar Nav Radio - Hide the circle indicator cleanly */
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 10px 14px !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    margin-bottom: 4px !important;
+    transition: all 0.15s ease !important;
+}
+
+/* Hide only the radio circle indicator button */
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label input,
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label > div:first-child:not(:last-child) {
     display: none !important;
     width: 0px !important;
     height: 0px !important;
-    max-width: 0px !important;
-    max-height: 0px !important;
+    position: absolute !important;
     opacity: 0 !important;
     visibility: hidden !important;
-    margin: 0px !important;
-    padding: 0px !important;
-    border: none !important;
 }
 
-[data-testid="stSidebar"] [data-testid="stRadio"] label [data-testid="stMarkdownContainer"] {
-    width: 100% !important;
+/* Ensure text and icons are 100% visible */
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label [data-testid="stMarkdownContainer"],
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label [data-testid="stMarkdownContainer"] p {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #94A3B8 !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
     margin: 0 !important;
     padding: 0 !important;
+    line-height: 1.3 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label:hover [data-testid="stMarkdownContainer"] p {
+    color: #ffffff !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) [data-testid="stMarkdownContainer"] p,
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label[data-checked="true"] [data-testid="stMarkdownContainer"] p {
+    color: #ffffff !important;
+    font-weight: 700 !important;
 }
 
 /* User Card in Sidebar */
@@ -751,21 +773,6 @@ div[data-testid="stHorizontalBlock"] .stButton button[kind="primary"] {
 # ==============================================================================
 with st.sidebar:
     render_html("""
-    <style>
-    section[data-testid="stSidebar"] [data-testid="stRadio"] label > *:not([data-testid="stMarkdownContainer"]),
-    section[data-testid="stSidebar"] [data-testid="stRadio"] label > div:first-child:not([data-testid="stMarkdownContainer"]),
-    section[data-testid="stSidebar"] [data-testid="stRadio"] label input,
-    section[data-testid="stSidebar"] [data-testid="stRadio"] label div[aria-hidden="true"],
-    section[data-testid="stSidebar"] [data-testid="stRadio"] label div[data-baseweb="radio"] {
-        display: none !important;
-        width: 0px !important;
-        height: 0px !important;
-        margin: 0px !important;
-        padding: 0px !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-    }
-    </style>
     <div>
         <div class="sidebar-brand-box">
             <div class="sidebar-logo-icon">
