@@ -950,40 +950,67 @@ elif "Executive Dossier" in selected_nav or "Intelligence" in selected_nav:
         </div>
         """)
         
-        m1, m2, m3, m4 = st.columns(4)
-        m1.metric("Email Status", d.get("email_validity", "Valid"))
-        m2.metric("Buying Role", d.get("buying_role", "Decision Maker"))
-        m3.metric("Est. Budget", d.get("budget", "Unknown / Not Disclosed"))
-        m4.metric("Timeline", d.get("timeline", "Unknown / Not Disclosed"))
+        email_stat = d.get("email_validity", "Valid")
+        buy_role = d.get("buying_role", "Decision Maker")
+        budget_disp = d.get("budget", "Unknown / Not Disclosed")
+        time_disp = d.get("timeline", "Unknown / Not Disclosed")
 
-        st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
-        c1, c2 = st.columns(2)
-        with c1:
-            render_html(f"""
-            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; height: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+        # 1. Equal-Height KPI Grid (No truncation or ellipses)
+        render_html(f"""
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 18px;">
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(15,23,42,0.02); display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Email Status</div>
+                <div style="font-size: 1.05rem; font-weight: 750; color: #15803d; display: flex; align-items: center; gap: 6px;">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
+                    {email_stat}
+                </div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(15,23,42,0.02); display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Buying Role</div>
+                <div style="font-size: 0.88rem; font-weight: 700; color: #172033; line-height: 1.35;">
+                    {buy_role}
+                </div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(15,23,42,0.02); display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Est. Budget</div>
+                <div style="font-size: 0.88rem; font-weight: 700; color: #172033; line-height: 1.35;">
+                    {budget_disp}
+                </div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(15,23,42,0.02); display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Timeline</div>
+                <div style="font-size: 0.88rem; font-weight: 700; color: #172033; line-height: 1.35;">
+                    {time_disp}
+                </div>
+            </div>
+        </div>
+        """)
+
+        # 2. Equal-Height 2-Column Grid (Aligned cards)
+        render_html(f"""
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 16px; align-items: stretch; margin-bottom: 18px;">
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; box-shadow: 0 2px 6px rgba(15,23,42,0.02); display: flex; flex-direction: column;">
+                <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 14px;">
                     Contact Intelligence
                 </div>
-                <div style="font-size: 0.85rem; color: #334155; line-height: 1.8;">
+                <div style="font-size: 0.86rem; color: #334155; line-height: 1.9; display: flex; flex-direction: column; gap: 6px;">
                     <div><b>Email:</b> <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0f172a;">{d.get('email', 'N/A')}</code></div>
                     <div><b>Phone:</b> <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0f172a;">{d.get('phone', 'N/A')}</code></div>
                     <div><b>Country / Location:</b> {d.get('country', 'N/A')}</div>
                     <div><b>Verified LinkedIn:</b> <a href="{d.get('linkedin_url', '#')}" target="_blank" style="color: #2563eb; font-weight: 600; text-decoration: none;">{d.get('linkedin_url', 'N/A')}</a></div>
                 </div>
             </div>
-            """)
-        with c2:
-            render_html(f"""
-            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; height: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 12px;">
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; box-shadow: 0 2px 6px rgba(15,23,42,0.02); display: flex; flex-direction: column;">
+                <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 14px;">
                     Requirements Specification
                 </div>
-                <div style="font-size: 0.85rem; color: #334155; line-height: 1.6;">
-                    <div style="margin-bottom: 8px;"><b>Referred Offering:</b><br><span style="color: #1e40af; font-weight: 700;">{d.get('referred_product', 'N/A')}</span></div>
+                <div style="font-size: 0.86rem; color: #334155; line-height: 1.6; display: flex; flex-direction: column; gap: 8px;">
+                    <div><b>Referred Offering:</b><br><span style="color: #1e40af; font-weight: 700;">{d.get('referred_product', 'N/A')}</span></div>
                     <div><b>Operational Use Case:</b><br><span style="color: #475569;">{d.get('use_case', 'N/A')}</span></div>
                 </div>
             </div>
-            """)
+        </div>
+        """)
 
         st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
         prof_sum = d.get("professional_summary") or d.get("summary") or "N/A"
