@@ -267,7 +267,7 @@ a.anchor-link, [data-testid="stHeaderActionElements"] {
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
-    gap: 4px !important;
+    gap: 5px !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label {
     width: 100% !important;
@@ -279,14 +279,13 @@ a.anchor-link, [data-testid="stHeaderActionElements"] {
     cursor: pointer !important;
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
     transition: all 0.15s ease !important;
     margin: 0 !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label * {
     color: #94A3B8 !important;
     font-weight: 600 !important;
-    font-size: 0.86rem !important;
+    font-size: 0.88rem !important;
     line-height: 1.2 !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label:hover {
@@ -304,8 +303,26 @@ a.anchor-link, [data-testid="stHeaderActionElements"] {
     color: #ffffff !important;
     font-weight: 700 !important;
 }
-[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label > div:first-child {
+
+/* Completely hide all radio circle inputs and indicator elements */
+[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label input,
+[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label > div:first-child:not([data-testid="stMarkdownContainer"]),
+[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label div[data-baseweb="radio"],
+[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label span,
+[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label svg {
     display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label > div[data-testid="stMarkdownContainer"] {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 /* User Card in Sidebar */
@@ -761,19 +778,6 @@ with st.sidebar:
         if opt_clean in selected_nav:
             st.session_state["active_nav"] = opt_clean
             break
-
-    render_html("""
-    <div class="sidebar-user-card">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="sidebar-user-avatar">A</div>
-            <div>
-                <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff; line-height: 1.1;">Admin User</div>
-                <div style="font-size: 0.65rem; color: #94a3b8;">Super Admin</div>
-            </div>
-        </div>
-        <div style="color: #64748b; font-size: 0.75rem;">∨</div>
-    </div>
-    """)
 
 d = st.session_state.get("current_dossier")
 
