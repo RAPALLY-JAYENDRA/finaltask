@@ -812,7 +812,7 @@ if "New Lead" in selected_nav or "Dashboard" in selected_nav:
         with btn_col1:
             clear_btn = st.form_submit_button("Clear All", use_container_width=True)
         with btn_col2:
-            submit_btn = st.form_submit_button("Next: Executive Dossier →", use_container_width=True, type="primary")
+            submit_btn = st.form_submit_button("Enrich Data", use_container_width=True, type="primary")
 
     if clear_btn:
         st.session_state["sample_lead"] = {}
