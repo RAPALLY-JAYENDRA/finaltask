@@ -125,15 +125,25 @@ render_html("""
     --focus-ring: #93C5FD;
 }
 
-html, body, .stApp, p, div, span, label, input, textarea, button, select, h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+html, body, .stApp {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     box-sizing: border-box;
 }
 
+p, label, input, textarea, button, select, h1, h2, h3, h4, h5, h6, [data-testid="stMarkdownContainer"] p {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
 /* Ensure Material Symbols and Streamlit icon fonts are never overridden */
-.material-symbols-rounded, .material-symbols-outlined, [data-testid="stIcon"], [data-testid="stExpanderToggleIcon"], svg {
-    font-family: inherit !important;
+.material-symbols-rounded, 
+.material-symbols-outlined, 
+[data-testid="stIcon"], 
+[data-testid="stIcon"] *,
+[data-testid="stExpanderToggleIcon"], 
+[data-testid="stExpanderToggleIcon"] *,
+svg {
+    font-family: 'Material Symbols Rounded', 'Material Symbols Outlined', inherit !important;
 }
 
 /* Clean Streamlit Expander Styling */
@@ -162,7 +172,7 @@ html, body, .stApp, p, div, span, label, input, textarea, button, select, h1, h2
     background: #f8fafc !important;
     color: var(--primary) !important;
 }
-[data-testid="stExpander"] summary p {
+[data-testid="stExpander"] summary [data-testid="stMarkdownContainer"] p {
     margin: 0 !important;
     font-weight: 650 !important;
     font-size: 0.88rem !important;
