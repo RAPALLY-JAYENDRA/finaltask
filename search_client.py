@@ -692,12 +692,22 @@ def _call_search_api(query: str, count: int = 5) -> list:
         count=count,
     )
 @trace_function
-def search_lead(lead_name: str, company: str = None, email: str = None, country: str = None, role: str = None, interests: str = None, message: str = None, count: int = 5) -> dict:
+def search_lead(lead_name: Any, company: str = None, email: str = None, country: str = None, role: str = None, interests: str = None, message: str = None, count: int = 5) -> dict:
     """
     Queries Google (CSE / Serp API) to gather info about the lead.
     Builds refined search queries strictly using the site:linkedin.com/in/ operator
     and supports name spelling variations (quoted, hyphenated, and unquoted) to match verified LinkedIn profiles.
     """
+    if isinstance(lead_name, dict):
+        lead_dict = lead_name
+        lead_name = lead_dict.get("name") or lead_dict.get("lead_name") or ""
+        company = company or lead_dict.get("company") or ""
+        email = email or lead_dict.get("email") or ""
+        country = country or lead_dict.get("country") or ""
+        role = role or lead_dict.get("role") or ""
+        interests = interests or lead_dict.get("interests") or ""
+        message = message or lead_dict.get("message") or ""
+
     name_clean = sanitize_search_input(lead_name)
     clean_company = sanitize_search_input(clean_company_name(company))
     inferred_company = sanitize_search_input(infer_company_from_email(email))
@@ -940,13 +950,23 @@ def search_lead(lead_name: str, company: str = None, email: str = None, country:
     }
 
 @trace_function
-async def search_lead_async(lead_name: str, company: str = None, email: str = None, country: str = None, role: str = None, interests: str = None, message: str = None, count: int = 5) -> dict:
+async def search_lead_async(lead_name: Any, company: str = None, email: str = None, country: str = None, role: str = None, interests: str = None, message: str = None, count: int = 5) -> dict:
     """
     Asynchronous version of search_lead that uses non-blocking call_search_api_async
     and extract_linkedin_profile_url_async.
     """
     from client_utils import call_search_api_async
     
+    if isinstance(lead_name, dict):
+        lead_dict = lead_name
+        lead_name = lead_dict.get("name") or lead_dict.get("lead_name") or ""
+        company = company or lead_dict.get("company") or ""
+        email = email or lead_dict.get("email") or ""
+        country = country or lead_dict.get("country") or ""
+        role = role or lead_dict.get("role") or ""
+        interests = interests or lead_dict.get("interests") or ""
+        message = message or lead_dict.get("message") or ""
+
     name_clean = sanitize_search_input(lead_name)
     clean_company = sanitize_search_input(clean_company_name(company))
     inferred_company = sanitize_search_input(infer_company_from_email(email))

@@ -793,9 +793,9 @@ if "New Lead" in selected_nav or "Dashboard" in selected_nav:
 
                 search_hits = []
                 try:
-                    search_hits = search_lead(lead_dict)
-                except Exception:
-                    pass
+                    search_hits = search_lead(lead_name=in_name, company=in_company, email=in_email, country=in_country, interests=in_interests, message=in_message)
+                except Exception as se:
+                    logger.warning("[SEARCH] Lead search error: %s", se)
 
                 status_text.markdown("**Step 2/4: Crawling Enterprise Subpages & Evidence Store...**")
                 progress_bar.progress(50)

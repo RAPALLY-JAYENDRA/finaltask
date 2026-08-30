@@ -588,7 +588,15 @@ async def scrape_linkedin_profile_async(url: str) -> dict:
     }
 
 
-async def resolve_linkedin_profile_async(results: list, lead_name: str, company: str = None, email: str = None, country: str = None, role: str = None, max_candidates: int = 4) -> dict:
+async def resolve_linkedin_profile_async(results: list, lead_name: Any, company: str = None, email: str = None, country: str = None, role: str = None, max_candidates: int = 4) -> dict:
+    if isinstance(lead_name, dict):
+        lead_dict = lead_name
+        lead_name = lead_dict.get("name") or lead_dict.get("lead_name") or ""
+        company = company or lead_dict.get("company") or ""
+        email = email or lead_dict.get("email") or ""
+        country = country or lead_dict.get("country") or ""
+        role = role or lead_dict.get("role") or ""
+
     logger.info("[LINKEDIN_DIAGNOSTIC] Resolution Start: Lead='%s' | Company='%s' | TotalCandidatesInPool=%d", lead_name, company or "N/A", len(results or []))
     ranked = _pre_rank_linkedin_candidates(results, lead_name, company, email, country, role)
 
@@ -881,7 +889,15 @@ async def resolve_linkedin_profile_async(results: list, lead_name: str, company:
     }
 
 
-def resolve_linkedin_profile(results: list, lead_name: str, company: str = None, email: str = None, country: str = None, role: str = None, max_candidates: int = 8) -> dict:
+def resolve_linkedin_profile(results: list, lead_name: Any, company: str = None, email: str = None, country: str = None, role: str = None, max_candidates: int = 8) -> dict:
+    if isinstance(lead_name, dict):
+        lead_dict = lead_name
+        lead_name = lead_dict.get("name") or lead_dict.get("lead_name") or ""
+        company = company or lead_dict.get("company") or ""
+        email = email or lead_dict.get("email") or ""
+        country = country or lead_dict.get("country") or ""
+        role = role or lead_dict.get("role") or ""
+
     try:
         return asyncio.run(resolve_linkedin_profile_async(results, lead_name, company, email, country, role, max_candidates))
     except RuntimeError as e:
@@ -898,7 +914,17 @@ def resolve_linkedin_profile(results: list, lead_name: str, company: str = None,
         return box.get("v", {"linkedin_url": "", "confidence_score": 0, "profile": {}, "reason": "Resolver thread failed."})
 
 
-def search_lead(lead_name: str, company: str = None, email: str = None, country: str = None, role: str = None, interests: str = None, message: str = None, count: int = 10) -> dict:
+def search_lead(lead_name: Any, company: str = None, email: str = None, country: str = None, role: str = None, interests: str = None, message: str = None, count: int = 10) -> dict:
+    if isinstance(lead_name, dict):
+        lead_dict = lead_name
+        lead_name = lead_dict.get("name") or lead_dict.get("lead_name") or ""
+        company = company or lead_dict.get("company") or ""
+        email = email or lead_dict.get("email") or ""
+        country = country or lead_dict.get("country") or ""
+        role = role or lead_dict.get("role") or ""
+        interests = interests or lead_dict.get("interests") or ""
+        message = message or lead_dict.get("message") or ""
+
     name = sanitize_search_input(lead_name)
     comp = sanitize_search_input(clean_company_name(company)) or sanitize_search_input(infer_company_from_email(email))
     country_map = {"ae": "UAE", "uae": "UAE", "united arab emirates": "UAE", "in": "India", "india": "India", "us": "USA", "usa": "USA", "uk": "UK"}
