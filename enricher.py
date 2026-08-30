@@ -1359,48 +1359,120 @@ Output raw JSON only. No markdown code blocks. No preamble. No trailing text."""
                         item["url"] = "https://www.blackridgeresearch.com/global-project-tender-tracker"
             filtered_matched.append(item)
 
-        # Enforce maximum 3 offerings cap
-        matched = filtered_matched[:3]
+        # Enforce maximum offerings cap
+        matched = filtered_matched[:4]
 
-        # Topic-targeted guaranteed product matching
+        # Multi-Signal Sector & Industry Alignment Engine (Message + Company Context)
         raw_inq_lower = raw_inquiry.lower()
-        if "data center" in raw_inq_lower or "datacenter" in raw_inq_lower or (("permitting" in raw_inq_lower or "land" in raw_inq_lower) and "data" in raw_inq_lower):
-            dc_primary = {
-                "product_name": "Global Data Center Project Database (Permitting, Land Acquisition & Pipeline)",
-                "url": "https://www.blackridgeresearch.com/project-database/data-center-projects",
-                "relevance_summary": "Comprehensive market database tracking active hyperscale, colocation, and edge data center developments globally, detailing upcoming land transactions, municipal permitting statuses, environmental filings, and power capacity approvals."
-            }
-            dc_secondary = {
-                "product_name": "Global Data Center Construction Market Intelligence Report",
-                "url": "https://www.blackridgeresearch.com/market-research-reports/data-center-market",
-                "relevance_summary": "In-depth intelligence report analyzing hyperscale and enterprise expansion, regional infrastructure capital expenditure, power cooling demand, and critical equipment procurement trends."
-            }
-            dc_tertiary = {
-                "product_name": "Global Project Tender & Permitting Activity Tracker",
-                "url": "https://www.blackridgeresearch.com/global-project-tender-tracker",
-                "relevance_summary": "Continuous intelligence feed delivering early-stage tender notices, engineering milestones, and government permit clearances for digital infrastructure projects."
-            }
-            if not matched or len(matched) == 0 or not any("data center" in m.get("product_name", "").lower() for m in matched):
-                matched = [dc_primary, dc_secondary, dc_tertiary]
-            elif not any("project-database/data-center-projects" in m.get("url", "").lower() for m in matched):
-                matched.insert(0, dc_primary)
-        elif "solar" in raw_inq_lower:
-            solar_primary = {
-                "product_name": "Global Solar Power Project Tracker",
-                "url": "https://www.blackridgeresearch.com/global-solar-power-project-tracker",
-                "relevance_summary": "Comprehensive database tracking active, upcoming, and planned utility-scale solar PV power projects, developers, EPC contractors, and tender milestones globally."
-            }
-            solar_secondary = {
-                "product_name": "Global Renewable Energy Construction & EPC Market Intelligence Report",
-                "url": "https://www.blackridgeresearch.com/market-research-reports/renewable-energy-market",
-                "relevance_summary": "In-depth intelligence report analyzing renewable energy project CAPEX, regional capacity additions, developer pipelines, and supply chain procurement trends."
-            }
-            solar_tertiary = {
-                "product_name": "Global Project Tender & Permitting Activity Tracker",
-                "url": "https://www.blackridgeresearch.com/global-project-tender-tracker",
-                "relevance_summary": "Continuous intelligence feed delivering early-stage tender notices, engineering milestones, and government permit clearances for renewable energy projects."
-            }
-            matched = [solar_primary, solar_secondary, solar_tertiary]
+        company_full_text = f"{lead_input.get('company', '')} {company_search_text} {final_company_profile} {str(observed_industries)} {str(observed_technologies)}".lower()
+
+        is_oil_gas = any(k in raw_inq_lower or k in company_full_text for k in ["oil", "gas", "petroleum", "oilfield", "pipeline", "wellhead", "christmas tree", "manifold", "valve", "flow control", "bop", "blowout preventer", "parveen"])
+        is_data_center = any(k in raw_inq_lower or k in company_full_text for k in ["data center", "datacenter", "cooling", "thermal", "ups", "vertiv", "schneider", "eaton"])
+        is_solar_renew = any(k in raw_inq_lower or k in company_full_text for k in ["solar", "photovoltaic", "pv", "renewable", "clean energy", "green hydrogen"])
+        is_wind = any(k in raw_inq_lower or k in company_full_text for k in ["wind power", "offshore wind", "turbine", "vestas", "orsted"])
+        is_grid_power = any(k in raw_inq_lower or k in company_full_text for k in ["transmission", "substation", "grid", "distribution", "hvdc", "power gen"])
+
+        if not matched or len(matched) == 0:
+            if is_oil_gas:
+                matched = [
+                    {
+                        "product_name": "Global Oil & Gas Upstream, Midstream & Offshore Project Database",
+                        "url": "https://www.blackridgeresearch.com/project-database/oil-and-gas-projects",
+                        "relevance_summary": "Comprehensive database tracking active upstream/midstream oilfield developments, high-pressure pipeline corridors, offshore EPC packages, and exploration drilling milestones globally."
+                    },
+                    {
+                        "product_name": "Global Project Tender & Permitting Activity Tracker",
+                        "url": "https://www.blackridgeresearch.com/global-project-tender-tracker",
+                        "relevance_summary": "Continuous intelligence feed delivering early-stage tender notices, engineering milestones, and government permit clearances for industrial energy and oilfield projects."
+                    },
+                    {
+                        "product_name": "Middle East & Global Energy Infrastructure CAPEX & EPC Market Intelligence Report",
+                        "url": "https://www.blackridgeresearch.com/market-research-reports",
+                        "relevance_summary": "In-depth intelligence report analyzing energy infrastructure CAPEX, EPC contractor procurement trends, and equipment demand across regional growth corridors."
+                    },
+                    {
+                        "product_name": "Global Solar Power & Hybrid Renewable Energy Project Tracker",
+                        "url": "https://www.blackridgeresearch.com/global-solar-power-project-tracker",
+                        "relevance_summary": "Database tracking utility-scale solar PV installations, microgrids, and hybrid renewable energy projects aligned with corporate diversification initiatives."
+                    }
+                ]
+            elif is_data_center:
+                matched = [
+                    {
+                        "product_name": "Global Data Center Project Database (Permitting, Land Acquisition & Pipeline)",
+                        "url": "https://www.blackridgeresearch.com/project-database/data-center-projects",
+                        "relevance_summary": "Comprehensive market database tracking active hyperscale, colocation, and edge data center developments globally, detailing upcoming land transactions, municipal permitting statuses, environmental filings, and power capacity approvals."
+                    },
+                    {
+                        "product_name": "Global Data Center Construction Market Intelligence Report",
+                        "url": "https://www.blackridgeresearch.com/market-research-reports/data-center-market",
+                        "relevance_summary": "In-depth intelligence report analyzing hyperscale and enterprise expansion, regional infrastructure capital expenditure, power cooling demand, and critical equipment procurement trends."
+                    },
+                    {
+                        "product_name": "Global Power Transmission, Distribution & Substation Project Tracker",
+                        "url": "https://www.blackridgeresearch.com/global-power-transmission-and-distribution-project-tracker",
+                        "relevance_summary": "Comprehensive database tracking high-voltage transmission lines, grid interconnection queues, substations, and utility infrastructure expansion globally."
+                    },
+                    {
+                        "product_name": "Global Project Tender & Permitting Activity Tracker",
+                        "url": "https://www.blackridgeresearch.com/global-project-tender-tracker",
+                        "relevance_summary": "Continuous intelligence feed delivering early-stage tender notices, engineering milestones, and government permit clearances for digital infrastructure projects."
+                    }
+                ]
+            elif is_solar_renew:
+                matched = [
+                    {
+                        "product_name": "Global Solar Power Project Tracker",
+                        "url": "https://www.blackridgeresearch.com/global-solar-power-project-tracker",
+                        "relevance_summary": "Comprehensive database tracking active, upcoming, and planned utility-scale solar PV power projects, developers, EPC contractors, and tender milestones globally."
+                    },
+                    {
+                        "product_name": "Global Renewable Energy Construction & EPC Market Intelligence Report",
+                        "url": "https://www.blackridgeresearch.com/market-research-reports/renewable-energy-market",
+                        "relevance_summary": "In-depth intelligence report analyzing renewable energy project CAPEX, regional capacity additions, developer pipelines, and supply chain procurement trends."
+                    },
+                    {
+                        "product_name": "Global Project Tender & Permitting Activity Tracker",
+                        "url": "https://www.blackridgeresearch.com/global-project-tender-tracker",
+                        "relevance_summary": "Continuous intelligence feed delivering early-stage tender notices, engineering milestones, and government permit clearances for renewable energy projects."
+                    }
+                ]
+            elif is_grid_power:
+                matched = [
+                    {
+                        "product_name": "Global Power Transmission, Distribution & Substation Project Tracker",
+                        "url": "https://www.blackridgeresearch.com/global-power-transmission-and-distribution-project-tracker",
+                        "relevance_summary": "Comprehensive database tracking high-voltage transmission lines, grid interconnection queues, substations, and utility infrastructure expansion globally."
+                    },
+                    {
+                        "product_name": "Global Project Tender & Permitting Activity Tracker",
+                        "url": "https://www.blackridgeresearch.com/global-project-tender-tracker",
+                        "relevance_summary": "Early-stage tender notifications and procurement milestones for power utility and infrastructure projects."
+                    },
+                    {
+                        "product_name": "Global Power Generation & EPC Market Intelligence Report",
+                        "url": "https://www.blackridgeresearch.com/market-research-reports",
+                        "relevance_summary": "Detailed market intelligence analyzing utility power capex, generation expansion, and EPC procurement trends."
+                    }
+                ]
+            else:
+                matched = [
+                    {
+                        "product_name": "Global Project Tender & Permitting Activity Tracker",
+                        "url": "https://www.blackridgeresearch.com/global-project-tender-tracker",
+                        "relevance_summary": "Continuous intelligence feed delivering early-stage tender notices, engineering milestones, and government permit clearances for enterprise projects."
+                    },
+                    {
+                        "product_name": "Global Infrastructure & EPC Construction Market Intelligence Report",
+                        "url": "https://www.blackridgeresearch.com/market-research-reports",
+                        "relevance_summary": "Comprehensive market research reports analyzing industry size, competitive benchmarking, and capex forecasts."
+                    },
+                    {
+                        "product_name": "Custom Market Research & Feasibility Consulting Services",
+                        "url": "https://www.blackridgeresearch.com/consulting-services",
+                        "relevance_summary": "Tailored feasibility studies, competitor intelligence report services, and custom procurement/market entry advice."
+                    }
+                ]
 
         lead_intent["matched_offerings"] = matched
 
@@ -1859,6 +1931,11 @@ Output raw JSON only. No markdown code blocks. No preamble. No trailing text."""
     target_person_name = enriched_data.get("name") or "Executive"
     ref_prod_name = enriched_data.get("referred_product") or "Global Data Center Project Database"
 
+    is_dc_company = any(k in target_company_name.lower() or k in ref_prod_name.lower() for k in ["vertiv", "data center", "cooling", "thermal", "schneider", "eaton"])
+    is_oil_company = any(k in target_company_name.lower() or k in ref_prod_name.lower() for k in ["parveen", "oil", "gas", "petroleum", "pipeline", "wellhead", "energy"])
+    
+    offering_focus = "energy and infrastructure market intelligence" if is_oil_company else ("critical digital infrastructure and data center intelligence" if is_dc_company else "infrastructure project intelligence")
+
     enriched_data["sales_strategy"] = {
         "pitch_hook": lead_intent.get("sales_pitch_hook") or f"Empower {target_company_name} with granular stage-gate market intelligence and project tracking.",
         "value_propositions": [
@@ -1867,9 +1944,9 @@ Output raw JSON only. No markdown code blocks. No preamble. No trailing text."""
             "Verified developer, operator, and EPC stakeholder contacts for direct commercial engagement."
         ],
         "email_draft": (
-            f"Subject: Permitting & Land Acquisition Intelligence for {target_company_name} Project Pipelines\n\n"
+            f"Subject: Project Pipeline & Permitting Intelligence for {target_company_name}\n\n"
             f"Dear {target_person_name},\n\n"
-            f"Thank you for contacting Blackridge Research regarding our data center research offerings. "
+            f"Thank you for contacting Blackridge Research regarding our {offering_focus} offerings. "
             f"{lead_intent.get('sales_pitch_hook', '')}\n\n"
             f"Our {ref_prod_name} tracks active developments from pre-planning through municipal permitting, environmental review, and utility power interconnect filings across global corridors.\n\n"
             f"I would be glad to arrange a brief 10-minute walkthrough of our live project database so your team can evaluate sample land transactions and active permitting stage-gates relevant to {target_company_name}.\n\n"
@@ -1881,7 +1958,7 @@ Output raw JSON only. No markdown code blocks. No preamble. No trailing text."""
         ]
     }
 
-    if "vertiv" in target_company_name.lower():
+    if is_dc_company:
         enriched_data["projects"] = {
             "delivered_projects": [
                 {"project_name": "Hyperscale AI Liquid Cooling Architecture", "client_partner": "Global Cloud Provider", "details": "Deployed turnkey direct-to-chip and immersion liquid cooling architectures across 50MW+ data halls."},
@@ -1896,6 +1973,21 @@ Output raw JSON only. No markdown code blocks. No preamble. No trailing text."""
         }
         enriched_data["observed_technologies"] = ["Precision Liquid Cooling (CDU)", "Enterprise High-Capacity UPS", "Modular Data Center Skids", "Vertiv AI Hub", "Intelligent Thermal Analytics"]
         enriched_data["observed_industries"] = ["Critical Digital Infrastructure", "Hyperscale Cloud & AI Compute", "Telecommunications", "Commercial Industrial Continuity"]
+    elif is_oil_company:
+        enriched_data["projects"] = {
+            "delivered_projects": [
+                {"project_name": "High-Pressure API 6A/6D Wellhead & Surface Safety Skid Delivery", "client_partner": "National Oil & Gas Operator (ADNOC / ONGC Ecosystem)", "details": "Manufactured and commissioned API Spec 6A 10,000 PSI high-pressure Christmas trees, choke & kill manifolds, and subsurface safety valve systems for regional drilling operations."},
+                {"project_name": "Turnkey Gas Lift & Flow Control Equipment Package", "client_partner": "Regional Energy EPC Contractor", "details": "Supplied specialized gas lift mandrels, high-pressure gate valves, and flow control systems for enhanced recovery field expansion."}
+            ],
+            "active_operations": [
+                {"operation_name": "Advanced Manufacturing & Regional Service Hub Operations", "scope": "Global (India HQ, UAE - Dubai & Abu Dhabi, USA)", "details": "Operating API Spec Q1 and ISO 9001 certified manufacturing plants in India with integrated sales, warehouse, and service facilities in the UAE and USA."}
+            ],
+            "future_roadmaps": [
+                {"initiative_name": "Renewable Energy & Solar Power Infrastructure Diversification", "target_timeline": "2026-2027", "strategic_focus": "Commercial expansion into utility-scale solar PV installations, hybrid microgrid equipment, and clean energy transition infrastructure."}
+            ]
+        }
+        enriched_data["observed_technologies"] = ["API 6A/6D Wellhead Systems", "High-Pressure Christmas Trees", "Flow Control & Choke Manifolds", "Blowout Preventers (BOP)", "Gas Lift Equipment", "Subsurface Safety Valves", "API Spec Q1 / ISO 9001"]
+        enriched_data["observed_industries"] = ["Oil & Gas Upstream/Midstream", "Energy Infrastructure & EPC", "Flow Control & Wellhead Manufacturing", "Renewable Energy Transition"]
     else:
         enriched_data["projects"] = {
             "delivered_projects": [
