@@ -988,9 +988,8 @@ elif "Leads" in selected_nav or "Reports" in selected_nav:
 # ==============================================================================
 elif "Settings" in selected_nav:
     st.markdown("### System Configuration & API Diagnostics")
-    cfg = get_config()
     st.write(f"**Embeddings Dimension:** 1024 (BGE-Large-En-v1.5)")
-    st.write(f"**Service Catalog Loaded:** {len(catalog.services)} services")
+    st.write(f"**Service Catalog Loaded:** {len(catalog.sectors)} canonical offerings")
     st.write(f"**Worker Proxy Status:** {'Configured' if is_worker_url_configured() else 'Fallback Mode'}")
     st.write(f"**Search Engine Provider:** {'Google Custom Search' if is_google_cse_configured() else ('SerpAPI' if is_serp_configured() else 'DuckDuckGo Engine')}")
 
