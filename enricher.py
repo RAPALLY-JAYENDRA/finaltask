@@ -349,11 +349,32 @@ def format_education(edu_list: list) -> str:
     return "\n".join(lines) if lines else "N/A"
 
 
-def enrich_lead_dossier(lead_input: dict, search_context: list, company_search_context: list = None) -> dict:
+def enrich_lead_dossier(
+    lead_input: dict,
+    search_context: Any = None,
+    company_search_context: list = None,
+    evidence_store: Any = None,
+    **kwargs
+) -> dict:
     """
-    Aggregates lead_input, search_context, and company_search_context, formats the worker payload,
-    posts to the Cloudflare Worker, and maps the response to the lead schema.
+    Aggregates lead_input, search_context, company_search_context, and evidence_store,
+    formats the worker payload, posts to the Cloudflare Worker, and maps the response to the lead schema.
     """
+    # Normalize search_context if passed as a dict
+    if isinstance(search_context, dict):
+        li_url_dict = search_context.get("linkedin_url") or ""
+        li_prof_dict = search_context.get("linkedin_profile") or {}
+        raw_hits = list(search_context.get("results") or [])
+        if li_prof_dict and isinstance(li_prof_dict, dict):
+            raw_hits.insert(0, {
+                "url": li_url_dict,
+                "title": li_prof_dict.get("title") or f"{lead_input.get('name', 'Lead')} - {lead_input.get('company', 'Enterprise')}",
+                "content": li_prof_dict.get("raw_text") or "",
+                "source": "linkedin_scraper",
+                "verified": True
+            })
+        search_context = raw_hits
+
     # -----------------------------------------------------------------------
     # 0. Resolve LinkedIn URL — deterministic, three-priority cascade
     # -----------------------------------------------------------------------
@@ -517,6 +538,15 @@ def enrich_lead_dossier(lead_input: dict, search_context: list, company_search_c
                 logger.warning(f"Jina Reader returned {jina_resp.status_code} for {company_website_url}")
         except Exception as cw_err:
             logger.warning(f"Company website crawl failed for {company_website_url}: {cw_err}")
+
+    if evidence_store and hasattr(evidence_store, "pages") and evidence_store.pages:
+        crawled_evidence_parts = []
+        for p in evidence_store.pages[:6]:
+            p_url = getattr(p, "url", "")
+            p_title = getattr(p, "title", "")
+            p_text = getattr(p, "clean_text", "")
+            crawled_evidence_parts.append(f"\n[Crawled Company Subpage: {p_url} ({p_title})]\n{p_text[:2000]}")
+        company_search_text += "\n\n" + "\n\n".join(crawled_evidence_parts)
 
     if not company_search_text:
         company_search_text = "N/A"
