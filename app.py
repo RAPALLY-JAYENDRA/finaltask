@@ -31,9 +31,12 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Helper to render clean HTML
+# Helper to render clean HTML without breaking into Markdown mode
 def render_html(html_str: str):
-    st.markdown(textwrap.dedent(html_str).strip(), unsafe_allow_html=True)
+    clean = re.sub(r'<!--.*?-->', '', str(html_str), flags=re.DOTALL)
+    lines = [line.strip() for line in clean.split('\n') if line.strip()]
+    single_line_html = ' '.join(lines)
+    st.markdown(single_line_html, unsafe_allow_html=True)
 
 # Helper to parse raw copied lead text (with emojis, tabs, colons)
 def parse_raw_lead_text(raw_text: str) -> dict:
@@ -1262,7 +1265,6 @@ elif "Offerings" in selected_nav or "Strategy Match" in selected_nav:
 
                     render_html(f"""
                     <div style="background: #FFFFFF; border: 1px solid var(--border); border-left: 4px solid {accent_color}; border-radius: 14px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03); transition: all 0.2s ease;">
-                        <!-- Top Row: Rank, Title, Badge -->
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 8px;">
                             <div style="display: flex; align-items: baseline; gap: 10px;">
                                 <span style="font-size: 0.82rem; font-weight: 800; color: #94A3B8; font-family: monospace;">{rank_str}</span>
@@ -1270,14 +1272,8 @@ elif "Offerings" in selected_nav or "Strategy Match" in selected_nav:
                             </div>
                             <div>{conf_badge}</div>
                         </div>
-                        
-                        <!-- Middle: Concise Description -->
                         <p style="color: #475569; font-size: 0.88rem; line-height: 1.6; margin: 0 0 6px 0;">{rel_text}</p>
-                        
-                        <!-- Collapsible Match Reasoning -->
                         {why_bullets}
-
-                        <!-- Bottom Row: Metadata Tags and Actions -->
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #F1F5F9;">
                             <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                                 {tag_pills}
