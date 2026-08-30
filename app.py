@@ -326,18 +326,33 @@ a.anchor-link, [data-testid="stHeaderActionElements"] {
     transition: all 0.15s ease !important;
 }
 
-/* Hide only the radio circle indicator button */
+/* Hide only the radio circle indicator button (first div child under label) */
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label > div:first-of-type:not(:only-of-type),
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label > div:not(:has([data-testid="stMarkdownContainer"])),
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label > div:not(:has(p)),
 [data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label input,
-[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label > div:first-child:not(:last-child) {
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label input + div,
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label div[aria-hidden="true"],
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label div[data-testid="stRadioCircle"] {
     display: none !important;
     width: 0px !important;
     height: 0px !important;
-    position: absolute !important;
+    min-width: 0px !important;
+    min-height: 0px !important;
+    max-width: 0px !important;
+    max-height: 0px !important;
+    margin: 0px !important;
+    padding: 0px !important;
+    border: none !important;
+    outline: none !important;
     opacity: 0 !important;
     visibility: hidden !important;
+    pointer-events: none !important;
 }
 
-/* Ensure text and icons are 100% visible */
+/* Ensure text and icons (last div child) are 100% visible */
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label > div:last-child,
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label > div:has([data-testid="stMarkdownContainer"]),
 [data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label [data-testid="stMarkdownContainer"],
 [data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label [data-testid="stMarkdownContainer"] p {
     display: block !important;
@@ -349,6 +364,7 @@ a.anchor-link, [data-testid="stHeaderActionElements"] {
     margin: 0 !important;
     padding: 0 !important;
     line-height: 1.3 !important;
+    width: 100% !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label:hover [data-testid="stMarkdownContainer"] p {
