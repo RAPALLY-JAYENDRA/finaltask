@@ -667,18 +667,21 @@ with st.sidebar:
         "Settings"
     ]
 
-    if "target_nav" in st.session_state and st.session_state["target_nav"]:
-        st.session_state["nav_selection"] = st.session_state.pop("target_nav")
+    if "active_nav" not in st.session_state or st.session_state["active_nav"] not in nav_options:
+        st.session_state["active_nav"] = "New Lead"
 
-    if "nav_selection" not in st.session_state or st.session_state["nav_selection"] not in nav_options:
-        st.session_state["nav_selection"] = "New Lead"
+    try:
+        current_index = nav_options.index(st.session_state["active_nav"])
+    except ValueError:
+        current_index = 0
 
     selected_nav = st.radio(
         label="Main Navigation",
         options=nav_options,
-        key="nav_selection",
+        index=current_index,
         label_visibility="collapsed"
     )
+    st.session_state["active_nav"] = selected_nav
 
     render_html("""
     <div class="sidebar-user-card">
@@ -824,7 +827,7 @@ if "New Lead" in selected_nav or "Dashboard" in selected_nav:
 
                 insert_lead(dossier)
                 st.session_state["current_dossier"] = dossier
-                st.session_state["target_nav"] = "Executive Dossier"
+                st.session_state["active_nav"] = "Executive Dossier"
                 progress_bar.progress(100)
                 status_text.markdown("**Strategic Lead Research Complete!**")
                 st.success(f"Successfully generated dossier for **{in_name or in_company}**! Opening Executive Dossier...")
@@ -840,15 +843,15 @@ if "New Lead" in selected_nav or "Dashboard" in selected_nav:
         c_go1, c_go2, c_go3 = st.columns(3)
         with c_go1:
             if st.button("Open Executive Dossier", use_container_width=True, type="primary"):
-                st.session_state["target_nav"] = "Executive Dossier"
+                st.session_state["active_nav"] = "Executive Dossier"
                 st.rerun()
         with c_go2:
             if st.button("View Strategy Match", use_container_width=True):
-                st.session_state["target_nav"] = "Strategy Match"
+                st.session_state["active_nav"] = "Strategy Match"
                 st.rerun()
         with c_go3:
             if st.button("View Sales Pitch & PDF", use_container_width=True):
-                st.session_state["target_nav"] = "Sales Outreach"
+                st.session_state["active_nav"] = "Sales Outreach"
                 st.rerun()
 
 # ==============================================================================
