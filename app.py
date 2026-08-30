@@ -103,10 +103,54 @@ render_html("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-*, html, body, [class*="css"], .stApp {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+html, body, .stApp, p, div, span, label, input, textarea, button, select, h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     box-sizing: border-box;
+}
+
+/* Ensure Material Symbols and Streamlit icon fonts are never overridden */
+.material-symbols-rounded, .material-symbols-outlined, [data-testid="stIcon"], [data-testid="stExpanderToggleIcon"], svg {
+    font-family: inherit !important;
+}
+
+/* Clean Streamlit Expander Styling without text overlap */
+[data-testid="stExpander"] {
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    margin-bottom: 14px !important;
+    overflow: hidden !important;
+}
+[data-testid="stExpander"] summary {
+    padding: 10px 16px !important;
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    background: #f8fafc !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    border: none !important;
+}
+[data-testid="stExpander"] summary:hover {
+    background: #f1f5f9 !important;
+    color: #2563eb !important;
+}
+[data-testid="stExpander"] summary p {
+    margin: 0 !important;
+    font-weight: 700 !important;
+    font-size: 0.88rem !important;
+    color: inherit !important;
+    line-height: 1.3 !important;
+}
+[data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+    padding: 14px 16px !important;
+    background: #ffffff !important;
+    border-top: 1px solid #e2e8f0 !important;
 }
 
 body, .stApp {
@@ -711,11 +755,11 @@ if "New Lead" in selected_nav or "Dashboard" in selected_nav:
     </div>
     """)
 
-    with st.expander("📋 Quick Paste & Auto-Fill Raw Lead Data (Click to Expand)", expanded=False):
+    with st.expander("📋 Quick Paste & Auto-Fill Raw Lead Data", expanded=False):
         raw_paste_input = st.text_area(
             "Paste raw copied lead text (Tab-separated or Key-Value format)",
-            placeholder="👤 Name\tJan Michael Cruz\n📧 Email\tJanMichael.Cruz@vertiv.com\n📞 Phone\t+63 998 968 7032\n🏢 Company\tVertiv\n🌍 Country\tPH\n💡 Interest\tOthers\n💬 Message\tHi, we are interested in data regarding permitting & land activities...",
-            height=85,
+            placeholder="Name\tJan Michael Cruz\nEmail\tJanMichael.Cruz@vertiv.com\nPhone\t+63 998 968 7032\nCompany\tVertiv\nCountry\tPH\nInterest\tOthers\nMessage\tHi, we are interested in data regarding permitting & land activities...",
+            height=95,
             key="raw_lead_paste_input"
         )
         if st.button("Auto-Fill Form Fields from Pasted Text", use_container_width=True, type="primary"):
