@@ -1130,77 +1130,93 @@ elif "Projects & Ops" in selected_nav:
         </div>
         """)
 
-        m1, m2, m3 = st.columns(3)
-        m1.metric("Turnkey Deployments", f"{max(len(deliv), 2)} Verified Projects", "Audited")
-        m2.metric("Operational Footprint", "130+ Countries", "Global Scale")
-        m3.metric("Strategic Horizon", "2026–2027", "Next-Gen Tech")
+        num_deliv = max(len(deliv), 2)
+        render_html(f"""
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 20px;">
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+                <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Turnkey Deployments</div>
+                <div style="font-size: 1.05rem; font-weight: 800; color: #172033;">{num_deliv} Verified Projects</div>
+                <div style="font-size: 0.74rem; font-weight: 700; color: #15803d; margin-top: 3px;">↑ Audited Infrastructure</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+                <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Operational Footprint</div>
+                <div style="font-size: 1.05rem; font-weight: 800; color: #172033;">130+ Countries</div>
+                <div style="font-size: 0.74rem; font-weight: 700; color: #15803d; margin-top: 3px;">↑ Global Scale</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+                <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Strategic Horizon</div>
+                <div style="font-size: 1.05rem; font-weight: 800; color: #172033;">2026–2027</div>
+                <div style="font-size: 0.74rem; font-weight: 700; color: #15803d; margin-top: 3px;">↑ Next-Gen Tech</div>
+            </div>
+        </div>
+        """)
+
+        # 1. Delivered Projects (Vertical Full Width)
+        st.markdown("#### 🏗️ Delivered Projects & Commercial Deployments")
+        if deliv:
+            for idx, p in enumerate(deliv, 1):
+                p_name = p.get('project_name', 'Commercial Infrastructure Deployment')
+                p_client = p.get('client_partner', comp_display)
+                p_det = p.get('details', 'High-density precision liquid cooling and power infrastructure deployment.')
+                render_html(f"""
+                <div style="background: #ffffff; border: 1px solid var(--border); border-left: 5px solid #2563eb; border-radius: 12px; padding: 18px 22px; margin-bottom: 14px; box-shadow: 0 3px 10px rgba(15,23,42,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px;">
+                        <div style="font-size: 0.98rem; font-weight: 800; color: #0f172a; line-height: 1.3;">#{idx} {p_name}</div>
+                        <span style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 9999px; white-space: nowrap; flex-shrink: 0;">Turnkey Execution</span>
+                    </div>
+                    <div style="font-size: 0.78rem; color: #64748b; font-weight: 600; margin-bottom: 10px;">
+                        Client / Ecosystem Partner: <span style="color: #0f172a; font-weight: 700;">{p_client}</span>
+                    </div>
+                    <div style="background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 8px; padding: 10px 14px; font-size: 0.86rem; color: #334155; line-height: 1.55;">
+                        <b>Deployment Scope:</b> {p_det}
+                    </div>
+                </div>
+                """)
+        else:
+            st.info("No delivered projects recorded.")
 
         st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
-        col_p1, col_p2 = st.columns(2)
-        with col_p1:
-            st.markdown("#### 🏗️ Delivered Projects & Deployments")
-            if deliv:
-                for idx, p in enumerate(deliv, 1):
-                    p_name = p.get('project_name', 'Commercial Infrastructure Deployment')
-                    p_client = p.get('client_partner', comp_display)
-                    p_det = p.get('details', 'High-density precision liquid cooling and power infrastructure deployment.')
-                    render_html(f"""
-                    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-left: 5px solid #2563eb; border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; box-shadow: 0 3px 10px rgba(0,0,0,0.03);">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px;">
-                            <div style="font-size: 0.98rem; font-weight: 800; color: #0f172a; line-height: 1.3;">#{idx} {p_name}</div>
-                            <span style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 9999px; white-space: nowrap; flex-shrink: 0;">Turnkey Execution</span>
-                        </div>
-                        <div style="font-size: 0.78rem; color: #64748b; font-weight: 600; margin-bottom: 10px;">
-                            Client / Ecosystem Partner: <span style="color: #0f172a; font-weight: 700;">{p_client}</span>
-                        </div>
-                        <div style="background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 8px; padding: 10px 12px; font-size: 0.85rem; color: #334155; line-height: 1.5;">
-                            <b>Deployment Scope:</b> {p_det}
-                        </div>
-                    </div>
-                    """)
-            else:
-                st.info("No delivered projects recorded.")
 
-        with col_p2:
-            st.markdown("#### ⚡ Active Operations & Strategic Roadmap")
-            if active:
-                for idx, op in enumerate(active, 1):
-                    op_name = op.get('operation_name', 'Global Manufacturing & Facility Scaling')
-                    op_scope = op.get('scope', 'Global (130+ Countries)')
-                    op_det = op.get('details', 'Active manufacturing and engineering facility operations.')
-                    render_html(f"""
-                    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-left: 5px solid #059669; border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; box-shadow: 0 3px 10px rgba(0,0,0,0.03);">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px;">
-                            <div style="font-size: 0.98rem; font-weight: 800; color: #0f172a; line-height: 1.3;">{op_name}</div>
-                            <span style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 9999px; white-space: nowrap; flex-shrink: 0;">Active Hub</span>
-                        </div>
-                        <div style="font-size: 0.78rem; color: #64748b; font-weight: 600; margin-bottom: 10px;">
-                            Operational Scope: <span style="color: #0f172a; font-weight: 700;">{op_scope}</span>
-                        </div>
-                        <div style="background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 8px; padding: 10px 12px; font-size: 0.85rem; color: #334155; line-height: 1.5;">
-                            <b>Capacity Details:</b> {op_det}
-                        </div>
+        # 2. Active Operations & Roadmap (Vertical Full Width)
+        st.markdown("#### ⚡ Active Operations & Strategic Roadmap")
+        if active:
+            for idx, op in enumerate(active, 1):
+                op_name = op.get('operation_name', 'Global Manufacturing & Facility Scaling')
+                op_scope = op.get('scope', 'Global (130+ Countries)')
+                op_det = op.get('details', 'Active manufacturing and engineering facility operations.')
+                render_html(f"""
+                <div style="background: #ffffff; border: 1px solid var(--border); border-left: 5px solid #059669; border-radius: 12px; padding: 18px 22px; margin-bottom: 14px; box-shadow: 0 3px 10px rgba(15,23,42,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px;">
+                        <div style="font-size: 0.98rem; font-weight: 800; color: #0f172a; line-height: 1.3;">{op_name}</div>
+                        <span style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 9999px; white-space: nowrap; flex-shrink: 0;">Active Hub</span>
                     </div>
-                    """)
-            if future:
-                for idx, fut in enumerate(future, 1):
-                    f_name = fut.get('initiative_name', 'Gigawatt-Scale Liquid Cooling Expansion')
-                    f_time = fut.get('target_timeline', '2026-2027')
-                    f_det = fut.get('strategic_focus', 'Ultra-high density rack thermal topologies and grid interconnect integrations.')
-                    render_html(f"""
-                    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-left: 5px solid #7c3aed; border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; box-shadow: 0 3px 10px rgba(0,0,0,0.03);">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px;">
-                            <div style="font-size: 0.98rem; font-weight: 800; color: #0f172a; line-height: 1.3;">{f_name}</div>
-                            <span style="background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 9999px; white-space: nowrap; flex-shrink: 0;">{f_time}</span>
-                        </div>
-                        <div style="font-size: 0.78rem; color: #64748b; font-weight: 600; margin-bottom: 10px;">
-                            Strategic Horizon: <span style="color: #0f172a; font-weight: 700;">Target Horizon ({f_time})</span>
-                        </div>
-                        <div style="background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 8px; padding: 10px 12px; font-size: 0.85rem; color: #334155; line-height: 1.5;">
-                            <b>Strategic Focus:</b> {f_det}
-                        </div>
+                    <div style="font-size: 0.78rem; color: #64748b; font-weight: 600; margin-bottom: 10px;">
+                        Operational Scope: <span style="color: #0f172a; font-weight: 700;">{op_scope}</span>
                     </div>
-                    """)
+                    <div style="background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 8px; padding: 10px 14px; font-size: 0.86rem; color: #334155; line-height: 1.55;">
+                        <b>Capacity Details:</b> {op_det}
+                    </div>
+                </div>
+                """)
+        if future:
+            for idx, fut in enumerate(future, 1):
+                f_name = fut.get('initiative_name', 'Gigawatt-Scale Liquid Cooling Expansion')
+                f_time = fut.get('target_timeline', '2026-2027')
+                f_det = fut.get('strategic_focus', 'Ultra-high density rack thermal topologies and grid interconnect integrations.')
+                render_html(f"""
+                <div style="background: #ffffff; border: 1px solid var(--border); border-left: 5px solid #7c3aed; border-radius: 12px; padding: 18px 22px; margin-bottom: 14px; box-shadow: 0 3px 10px rgba(15,23,42,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px;">
+                        <div style="font-size: 0.98rem; font-weight: 800; color: #0f172a; line-height: 1.3;">{f_name}</div>
+                        <span style="background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 9999px; white-space: nowrap; flex-shrink: 0;">{f_time}</span>
+                    </div>
+                    <div style="font-size: 0.78rem; color: #64748b; font-weight: 600; margin-bottom: 10px;">
+                        Strategic Horizon: <span style="color: #0f172a; font-weight: 700;">Target Horizon ({f_time})</span>
+                    </div>
+                    <div style="background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 8px; padding: 10px 14px; font-size: 0.86rem; color: #334155; line-height: 1.55;">
+                        <b>Strategic Focus:</b> {f_det}
+                    </div>
+                </div>
+                """)
 
 # ==============================================================================
 # TAB 5: STRATEGIC OFFERINGS & MATCH
