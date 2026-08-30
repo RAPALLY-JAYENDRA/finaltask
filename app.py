@@ -986,40 +986,64 @@ elif "Executive Dossier" in selected_nav or "Intelligence" in selected_nav:
         </div>
         """)
 
-        # 2. Equal-Height 2-Column Grid (Aligned cards)
+        # 2. Contact Intelligence (Full Width Card)
         render_html(f"""
-        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 16px; align-items: stretch; margin-bottom: 18px;">
-            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; box-shadow: 0 2px 6px rgba(15,23,42,0.02); display: flex; flex-direction: column;">
-                <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 14px;">
-                    Contact Intelligence
-                </div>
-                <div style="font-size: 0.86rem; color: #334155; line-height: 1.9; display: flex; flex-direction: column; gap: 6px;">
-                    <div><b>Email:</b> <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0f172a;">{d.get('email', 'N/A')}</code></div>
-                    <div><b>Phone:</b> <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0f172a;">{d.get('phone', 'N/A')}</code></div>
-                    <div><b>Country / Location:</b> {d.get('country', 'N/A')}</div>
-                    <div><b>Verified LinkedIn:</b> <a href="{d.get('linkedin_url', '#')}" target="_blank" style="color: #2563eb; font-weight: 600; text-decoration: none;">{d.get('linkedin_url', 'N/A')}</a></div>
-                </div>
+        <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+            <div style="font-size: 0.98rem; font-weight: 800; color: #0f172a; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+                <span>👤</span> Contact Intelligence & Verification
             </div>
-            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; box-shadow: 0 2px 6px rgba(15,23,42,0.02); display: flex; flex-direction: column;">
-                <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 14px;">
-                    Requirements Specification
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; font-size: 0.86rem; color: #334155;">
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px;">
+                    <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 3px;">Business Email</div>
+                    <code style="background: transparent; color: #0f172a; font-weight: 600; font-size: 0.85rem;">{d.get('email', 'N/A')}</code>
                 </div>
-                <div style="font-size: 0.86rem; color: #334155; line-height: 1.6; display: flex; flex-direction: column; gap: 8px;">
-                    <div><b>Referred Offering:</b><br><span style="color: #1e40af; font-weight: 700;">{d.get('referred_product', 'N/A')}</span></div>
-                    <div><b>Operational Use Case:</b><br><span style="color: #475569;">{d.get('use_case', 'N/A')}</span></div>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px;">
+                    <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 3px;">Phone Number</div>
+                    <code style="background: transparent; color: #0f172a; font-weight: 600; font-size: 0.85rem;">{d.get('phone', 'N/A')}</code>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px;">
+                    <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 3px;">Country / Location</div>
+                    <div style="color: #0f172a; font-weight: 600; font-size: 0.85rem;">{d.get('country', 'N/A')}</div>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px;">
+                    <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 3px;">Verified LinkedIn Profile</div>
+                    <a href="{d.get('linkedin_url', '#')}" target="_blank" style="color: #2563eb; font-weight: 600; font-size: 0.85rem; text-decoration: none; word-break: break-all;">
+                        {d.get('linkedin_url', 'N/A')} ↗
+                    </a>
                 </div>
             </div>
         </div>
         """)
 
-        st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
+        # 3. Requirements Specification (Full Width Card)
+        render_html(f"""
+        <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+            <div style="font-size: 0.98rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <span>📋</span> Inbound Requirements & Operational Specification
+            </div>
+            <div style="margin-bottom: 12px;">
+                <div style="font-size: 0.76rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">Referred Strategic Offering</div>
+                <div style="font-size: 0.92rem; font-weight: 700; color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 8px 14px;">
+                    {d.get('referred_product', 'N/A')}
+                </div>
+            </div>
+            <div>
+                <div style="font-size: 0.76rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">Operational Use Case Description</div>
+                <div style="font-size: 0.88rem; color: #334155; line-height: 1.65; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px;">
+                    {d.get('use_case', 'N/A')}
+                </div>
+            </div>
+        </div>
+        """)
+
+        # 4. Executive Synthesis & Track Record (Full Width Card)
         prof_sum = d.get("professional_summary") or d.get("summary") or "N/A"
         render_html(f"""
-        <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 20px 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-            <div style="font-size: 1.0rem; font-weight: 800; color: #0f172a; margin-bottom: 12px;">
-                Executive Synthesis & Track Record
+        <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+            <div style="font-size: 1.0rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <span>🧠</span> Executive Synthesis & Track Record
             </div>
-            <div style="font-size: 0.88rem; color: #334155; line-height: 1.65; white-space: pre-line;">
+            <div style="font-size: 0.88rem; color: #334155; line-height: 1.7; white-space: pre-line;">
 {prof_sum}
             </div>
         </div>
