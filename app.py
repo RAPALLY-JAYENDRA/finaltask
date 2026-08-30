@@ -657,23 +657,23 @@ with st.sidebar:
     """)
 
     nav_options = [
-        "Dashboard",
         "New Lead",
-        "Leads",
-        "Intelligence",
+        "Executive Dossier",
         "Company Intel",
         "Projects & Ops",
-        "Offerings",
         "Strategy Match",
         "Sales Outreach",
-        "Reports",
+        "Leads Database",
         "Settings"
     ]
+
+    if "nav_selection" not in st.session_state or st.session_state["nav_selection"] not in nav_options:
+        st.session_state["nav_selection"] = "New Lead"
 
     selected_nav = st.radio(
         label="Main Navigation",
         options=nav_options,
-        index=1,  # Default to New Lead
+        key="nav_selection",
         label_visibility="collapsed"
     )
 
@@ -821,14 +821,32 @@ if "New Lead" in selected_nav or "Dashboard" in selected_nav:
 
                 insert_lead(dossier)
                 st.session_state["current_dossier"] = dossier
+                st.session_state["nav_selection"] = "Executive Dossier"
                 progress_bar.progress(100)
                 status_text.markdown("**Strategic Lead Research Complete!**")
-                st.success(f"Successfully generated dossier for **{in_name or in_company}**! Routing to Executive Dossier...")
-                time.sleep(0.8)
+                st.success(f"Successfully generated dossier for **{in_name or in_company}**! Opening Executive Dossier...")
+                time.sleep(0.5)
                 st.rerun()
 
             except Exception as e:
                 st.error(f"Research execution failed: {str(e)}")
+
+    if d:
+        st.markdown("<hr style='margin: 16px 0;'>", unsafe_allow_html=True)
+        st.info(f"Active Dossier Loaded: **{d.get('name', 'Executive')}** ({d.get('company', 'Enterprise')})")
+        c_go1, c_go2, c_go3 = st.columns(3)
+        with c_go1:
+            if st.button("Open Executive Dossier", use_container_width=True, type="primary"):
+                st.session_state["nav_selection"] = "Executive Dossier"
+                st.rerun()
+        with c_go2:
+            if st.button("View Strategy Match", use_container_width=True):
+                st.session_state["nav_selection"] = "Strategy Match"
+                st.rerun()
+        with c_go3:
+            if st.button("View Sales Pitch & PDF", use_container_width=True):
+                st.session_state["nav_selection"] = "Sales Outreach"
+                st.rerun()
 
 # ==============================================================================
 # TAB 2: EXECUTIVE DOSSIER
