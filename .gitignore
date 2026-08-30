@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+.env.*
+.env.example
+.DS_Store
+.system_generated/
+*.log
+*.db
+test_dossier.pdf
