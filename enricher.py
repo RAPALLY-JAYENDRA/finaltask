@@ -244,13 +244,32 @@ def enrich_lead_dossier(
     message = (lead_input.get("message") or "").strip()
     website = (lead_input.get("website") or lead_input.get("page_url") or "").strip()
 
-    # 1. Resolve LinkedIn URL
-    extracted_li = ""
-    for h in (search_context or []):
-        u = h.get("url") or ""
-        if "linkedin.com/in/" in u.lower():
-            extracted_li = u
-            break
+    # 1. Resolve LinkedIn URL and search hits
+    search_hits_list = []
+    linkedin_url_from_search = ""
+    if isinstance(search_context, dict):
+        linkedin_url_from_search = search_context.get("linkedin_url") or ""
+        search_hits_list = search_context.get("results") or []
+        li_prof = search_context.get("linkedin_profile")
+        if isinstance(li_prof, dict) and li_prof.get("raw_text"):
+            search_hits_list.append({
+                "title": li_prof.get("title") or f"{name} LinkedIn Profile",
+                "snippet": li_prof.get("raw_text")[:2000]
+            })
+    elif isinstance(search_context, list):
+        search_hits_list = search_context
+
+    extracted_li = linkedin_url_from_search
+    if not extracted_li:
+        for h in search_hits_list:
+            if isinstance(h, dict):
+                u = h.get("url") or ""
+                if "linkedin.com/in/" in u.lower():
+                    extracted_li = u
+                    break
+            elif isinstance(h, str) and "linkedin.com/in/" in h.lower():
+                extracted_li = h
+                break
     
     linkedin_url = lead_input.get("linkedin_url") or extracted_li or ""
     if linkedin_url:
@@ -296,8 +315,13 @@ def enrich_lead_dossier(
         scraped_context += f"\n--- Page: {p.title} ({p.url}) ---\n{p.clean_text[:2500]}\n"
 
     linkedin_context = ""
-    for hit in (search_context or [])[:5]:
-        linkedin_context += f"\n- {hit.get('title')}: {hit.get('snippet') or hit.get('content')}"
+    for hit in search_hits_list[:5]:
+        if isinstance(hit, dict):
+            t = hit.get('title') or 'Profile Reference'
+            s = hit.get('snippet') or hit.get('content') or hit.get('description') or ''
+            linkedin_context += f"\n- {t}: {s}"
+        elif isinstance(hit, str):
+            linkedin_context += f"\n- {hit}"
 
     # Run AI analysis via WorkerAI or Cloudflare Worker
     ai_system_prompt = """You are a Senior Principal Enterprise Intelligence & Offering Matcher.
@@ -361,26 +385,43 @@ Matched Vector Offerings:
                 "user_prompt": ai_user_prompt,
                 "max_tokens": 3000
             })
-            raw_text = worker_resp.get("response") or worker_resp.get("raw_text") or worker_resp.get("text") or ""
-            if isinstance(raw_text, str):
+            if isinstance(worker_resp, dict):
+                raw_text = worker_resp.get("response") or worker_resp.get("raw_text") or worker_resp.get("text") or ""
+            else:
+                raw_text = str(worker_resp)
+
+            if isinstance(raw_text, str) and raw_text.strip():
                 clean_json_str = re.sub(r'^```(?:json)?\s*', '', raw_text.strip(), flags=re.IGNORECASE)
                 clean_json_str = re.sub(r'\s*```$', '', clean_json_str)
-                raw_ai_res = json.loads(clean_json_str)
+                try:
+                    parsed = json.loads(clean_json_str)
+                    if isinstance(parsed, dict):
+                        raw_ai_res = parsed
+                except Exception:
+                    pass
             elif isinstance(raw_text, dict):
                 raw_ai_res = raw_text
     except Exception as e:
         logger.warning(f"Worker AI synthesis error: {e}")
 
     # Fallback to local worker_ai helper if needed
-    if not raw_ai_res:
+    if not raw_ai_res or not isinstance(raw_ai_res, dict):
         try:
             llm_text = ai._call_llm(ai_user_prompt, ai_system_prompt)
-            if llm_text:
+            if llm_text and isinstance(llm_text, str):
                 clean_str = re.sub(r'^```(?:json)?\s*', '', llm_text.strip(), flags=re.IGNORECASE)
                 clean_str = re.sub(r'\s*```$', '', clean_str)
-                raw_ai_res = json.loads(clean_str)
+                try:
+                    parsed = json.loads(clean_str)
+                    if isinstance(parsed, dict):
+                        raw_ai_res = parsed
+                except Exception:
+                    pass
         except Exception as e:
             logger.warning(f"Local AI fallback error: {e}")
+
+    if not isinstance(raw_ai_res, dict):
+        raw_ai_res = {}
 
     # Build validated dossier dict
     summary_val = raw_ai_res.get("summary") or f"Strategic intelligence analysis for {name} ({company})."
