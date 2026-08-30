@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import time
 import textwrap
@@ -33,6 +34,59 @@ st.set_page_config(
 # Helper to render clean HTML
 def render_html(html_str: str):
     st.markdown(textwrap.dedent(html_str).strip(), unsafe_allow_html=True)
+
+# Helper to parse raw copied lead text (with emojis, tabs, colons)
+def parse_raw_lead_text(raw_text: str) -> dict:
+    if not raw_text or not raw_text.strip():
+        return {}
+    parsed = {}
+    lines = raw_text.strip().split('\n')
+    clean_lines = []
+    for line in lines:
+        cleaned = re.sub(r'[\U00010000-\U0010ffff\u2600-\u26ff\u2700-\u27bf]', '', line).strip()
+        if cleaned:
+            clean_lines.append(cleaned)
+    for line in clean_lines:
+        key, val = '', ''
+        if '\t' in line:
+            parts = [p.strip() for p in line.split('\t') if p.strip()]
+            if len(parts) >= 2:
+                key, val = parts[0], '\t'.join(parts[1:])
+            elif len(parts) == 1 and ':' in parts[0]:
+                k, v = parts[0].split(':', 1)
+                key, val = k.strip(), v.strip()
+        elif ':' in line:
+            k, v = line.split(':', 1)
+            key, val = k.strip(), v.strip()
+        elif '  ' in line:
+            parts = [p.strip() for p in line.split('  ') if p.strip()]
+            if len(parts) >= 2:
+                key, val = parts[0], parts[1]
+        k_lower = key.lower()
+        if not key or not val:
+            continue
+        if 'name' in k_lower and 'company' not in k_lower:
+            parsed['name'] = val
+        elif 'email' in k_lower and 'validity' not in k_lower:
+            parsed['email'] = val
+        elif 'phone' in k_lower or 'mobile' in k_lower:
+            parsed['phone'] = val
+        elif 'company' in k_lower or 'enterprise' in k_lower:
+            parsed['company'] = val
+        elif 'country' in k_lower or 'region' in k_lower:
+            parsed['country'] = val
+        elif 'interest' in k_lower:
+            parsed['interests'] = val
+        elif 'message' in k_lower or 'requirement' in k_lower or 'note' in k_lower:
+            parsed['message'] = val
+        elif 'url' in k_lower or 'website' in k_lower or 'domain' in k_lower:
+            if 'linkedin' not in k_lower and 'blackridge' not in val:
+                parsed['website'] = val
+    if not parsed.get('website') and parsed.get('email') and '@' in parsed.get('email'):
+        domain = parsed['email'].split('@')[-1].lower()
+        if domain not in ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com']:
+            parsed['website'] = f'https://www.{domain}'
+    return parsed
 
 # App State
 if "current_dossier" not in st.session_state:
@@ -651,30 +705,41 @@ if "New Lead" in selected_nav or "Dashboard" in selected_nav:
     </div>
     """)
 
+    with st.expander("📋 Quick Paste & Auto-Fill Raw Lead Data (Click to Expand)", expanded=False):
+        raw_paste_input = st.text_area(
+            "Paste raw copied lead text (Tab-separated or Key-Value format)",
+            placeholder="👤 Name\tJan Michael Cruz\n📧 Email\tJanMichael.Cruz@vertiv.com\n📞 Phone\t+63 998 968 7032\n🏢 Company\tVertiv\n🌍 Country\tPH\n💡 Interest\tOthers\n💬 Message\tHi, we are interested in data regarding permitting & land activities...",
+            height=85,
+            key="raw_lead_paste_input"
+        )
+        if st.button("Auto-Fill Form Fields from Pasted Text", use_container_width=True, type="primary"):
+            if raw_paste_input.strip():
+                parsed_data = parse_raw_lead_text(raw_paste_input)
+                st.session_state["sample_lead"] = parsed_data
+                st.success(f"Successfully auto-filled {len(parsed_data)} lead fields!")
+                time.sleep(0.3)
+                st.rerun()
+
     with st.form("lead_intake_form", clear_on_submit=False):
         r1_c1, r1_c2 = st.columns(2)
         with r1_c1:
-            in_name = st.text_input("Lead Full Name *", value=sample.get("name", ""), placeholder="e.g. Gabriel Bathan")
+            in_name = st.text_input("Lead Full Name *", value=sample.get("name", ""), placeholder="e.g. Jan Michael Cruz")
         with r1_c2:
             in_company = st.text_input("Target Enterprise / Company *", value=sample.get("company", ""), placeholder="e.g. Vertiv")
 
         r2_c1, r2_c2 = st.columns(2)
         with r2_c1:
-            in_email = st.text_input("Business Email *", value=sample.get("email", ""), placeholder="e.g. gbathan@vertiv.com")
+            in_email = st.text_input("Business Email *", value=sample.get("email", ""), placeholder="e.g. JanMichael.Cruz@vertiv.com")
         with r2_c2:
             in_website = st.text_input("Company Website Domain (Optional)", value=sample.get("website", ""), placeholder="e.g. https://www.vertiv.com")
 
         r3_c1, r3_c2 = st.columns(2)
         with r3_c1:
-            in_phone = st.text_input("Phone Number", value=sample.get("phone", ""), placeholder="e.g. +1 (614) 888-0246")
+            in_phone = st.text_input("Phone Number", value=sample.get("phone", ""), placeholder="e.g. +63 998 968 7032")
         with r3_c2:
-            in_country = st.text_input("Country / Region", value=sample.get("country", "United States"), placeholder="e.g. United States")
+            in_country = st.text_input("Country / Region", value=sample.get("country", "United States"), placeholder="e.g. PH")
 
-        r4_c1, r4_c2 = st.columns(2)
-        with r4_c1:
-            in_linkedin = st.text_input("LinkedIn Profile URL (Optional)", value=sample.get("linkedin", ""), placeholder="https://www.linkedin.com/in/...")
-        with r4_c2:
-            in_interests = st.text_input("Stated Interests / Referred Service", value=sample.get("interests", ""), placeholder="e.g. Data Center Liquid Cooling Power Tracking")
+        in_interests = st.text_input("Stated Interests / Referred Service", value=sample.get("interests", ""), placeholder="e.g. Others / Data Center Research")
 
         in_message = st.text_area(
             "Inbound Message / Inquired Requirements / Notes *",
@@ -723,7 +788,7 @@ if "New Lead" in selected_nav or "Dashboard" in selected_nav:
                     "country": in_country,
                     "interests": in_interests,
                     "message": in_message,
-                    "linkedin_url": in_linkedin
+                    "linkedin_url": sample.get("linkedin", "")
                 }
 
                 search_hits = []
