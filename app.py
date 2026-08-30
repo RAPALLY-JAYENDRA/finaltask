@@ -315,21 +315,25 @@ a.anchor-link, [data-testid="stHeaderActionElements"] {
 }
 
 /* Completely hide all radio circle inputs and indicator elements */
-[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label input,
-[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label > div:first-child:not([data-testid="stMarkdownContainer"]),
-[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label div[data-baseweb="radio"],
-[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label span,
-[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label svg {
+[data-testid="stSidebar"] [data-testid="stRadio"] label > *:not([data-testid="stMarkdownContainer"]),
+[data-testid="stSidebar"] [data-testid="stRadio"] label > div:not([data-testid="stMarkdownContainer"]),
+[data-testid="stSidebar"] [data-testid="stRadio"] label input,
+[data-testid="stSidebar"] [data-testid="stRadio"] label div[aria-hidden="true"],
+[data-testid="stSidebar"] [data-testid="stRadio"] label div[data-baseweb="radio"],
+[data-testid="stSidebar"] [data-testid="stRadio"] label svg {
     display: none !important;
-    width: 0 !important;
-    height: 0 !important;
+    width: 0px !important;
+    height: 0px !important;
+    max-width: 0px !important;
+    max-height: 0px !important;
     opacity: 0 !important;
     visibility: hidden !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    margin: 0px !important;
+    padding: 0px !important;
+    border: none !important;
 }
 
-[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] label > div[data-testid="stMarkdownContainer"] {
+[data-testid="stSidebar"] [data-testid="stRadio"] label [data-testid="stMarkdownContainer"] {
     width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -747,6 +751,21 @@ div[data-testid="stHorizontalBlock"] .stButton button[kind="primary"] {
 # ==============================================================================
 with st.sidebar:
     render_html("""
+    <style>
+    section[data-testid="stSidebar"] [data-testid="stRadio"] label > *:not([data-testid="stMarkdownContainer"]),
+    section[data-testid="stSidebar"] [data-testid="stRadio"] label > div:first-child:not([data-testid="stMarkdownContainer"]),
+    section[data-testid="stSidebar"] [data-testid="stRadio"] label input,
+    section[data-testid="stSidebar"] [data-testid="stRadio"] label div[aria-hidden="true"],
+    section[data-testid="stSidebar"] [data-testid="stRadio"] label div[data-baseweb="radio"] {
+        display: none !important;
+        width: 0px !important;
+        height: 0px !important;
+        margin: 0px !important;
+        padding: 0px !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+    </style>
     <div>
         <div class="sidebar-brand-box">
             <div class="sidebar-logo-icon">
