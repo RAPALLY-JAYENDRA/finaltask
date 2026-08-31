@@ -44,7 +44,39 @@ except Exception as _sc_err:
 
 logger = logging.getLogger(__name__)
 
-# --- Pydantic Validation Schemas ---
+def resolve_canonical_catalog_url(product_name: str) -> str:
+    """Maps any catalog product or sector name strictly to verified live Blackridge Research URLs."""
+    p = str(product_name).lower().strip()
+    if "solar" in p or "pv" in p or "photovoltaic" in p:
+        if "report" in p or "market" in p:
+            return "https://www.blackridgeresearch.com/market-research-reports/renewable-energy-market"
+        return "https://www.blackridgeresearch.com/global-solar-power-project-tracker"
+    elif "data center" in p or "datacenter" in p or "colocation" in p:
+        if "report" in p or "market" in p:
+            return "https://www.blackridgeresearch.com/market-research-reports/data-center-market"
+        return "https://www.blackridgeresearch.com/project-database/data-center-projects"
+    elif "wind" in p or "offshore" in p:
+        return "https://www.blackridgeresearch.com/global-wind-power-project-tracker"
+    elif "battery" in p or "bess" in p or "storage" in p:
+        return "https://www.blackridgeresearch.com/global-battery-energy-storage-systems-bess-project-tracker"
+    elif "hydrogen" in p or "fuel cell" in p or "electrolyzer" in p:
+        return "https://www.blackridgeresearch.com/global-hydrogen-project-tracker"
+    elif "oil" in p or "gas" in p or "petroleum" in p or "pipeline" in p or "upstream" in p or "midstream" in p or "wellhead" in p:
+        return "https://www.blackridgeresearch.com/project-database/oil-and-gas-projects"
+    elif "transmission" in p or "distribution" in p or "grid" in p or "substation" in p:
+        return "https://www.blackridgeresearch.com/global-power-transmission-and-distribution-project-tracker"
+    elif "subsea" in p or "submarine" in p or "cable" in p:
+        return "https://www.blackridgeresearch.com/global-subsea-power-and-telecom-cable-project-tracker"
+    elif "tender" in p or "permitting" in p or "procurement" in p or "tracker" in p:
+        return "https://www.blackridgeresearch.com/global-project-tender-tracker"
+    elif "consulting" in p or "advisory" in p or "feasibility" in p:
+        return "https://www.blackridgeresearch.com/consulting-services"
+    elif "profile" in p or "company" in p:
+        return "https://www.blackridgeresearch.com/company-profiles/"
+    elif "report" in p or "market research" in p or "intelligence" in p:
+        return "https://www.blackridgeresearch.com/market-research-reports"
+    else:
+        return "https://www.blackridgeresearch.com/global-project-tender-tracker"
 
 class Pass1Extraction(BaseModel):
     projects: List[str] = Field(default_factory=list)
@@ -1404,10 +1436,10 @@ Output raw JSON only. No markdown code blocks. No preamble. No trailing text."""
                         for vc in v_cands[:4]:
                             vc_name = vc.get("canonical_name") or vc.get("primary_sector")
                             vc_def = vc.get("definition", "")
-                            vc_slug = re.sub(r'[^a-zA-Z0-9]+', '-', vc_name.lower()).strip('-')
+                            v_url = resolve_canonical_catalog_url(vc_name)
                             v_matched.append({
                                 "product_name": vc_name,
-                                "url": f"https://www.blackridgeresearch.com/project-database/{vc_slug}",
+                                "url": v_url,
                                 "relevance_summary": f"{vc_def} Directly resolves project visibility and procurement requirements for {c_name_query}."
                             })
                         if v_matched:
@@ -1517,6 +1549,13 @@ Output raw JSON only. No markdown code blocks. No preamble. No trailing text."""
                         "relevance_summary": "Tailored feasibility studies, competitor intelligence report services, and custom procurement/market entry advice."
                     }
                 ]
+
+        # Enforce canonical live URL for EVERY item in matched offerings
+        for m in matched:
+            m_pname = m.get("product_name", "")
+            m_curr_url = m.get("url", "")
+            if not m_curr_url or "solar-photovoltaic" in m_curr_url or m_curr_url.endswith("/project-database/") or "/project-database/cat_" in m_curr_url:
+                m["url"] = resolve_canonical_catalog_url(m_pname)
 
         lead_intent["matched_offerings"] = matched
 
