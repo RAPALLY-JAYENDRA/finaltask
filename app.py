@@ -38,57 +38,101 @@ def render_html(html_str: str):
     single_line_html = ' '.join(lines)
     st.markdown(single_line_html, unsafe_allow_html=True)
 
-# Helper to parse raw copied lead text (with emojis, tabs, colons)
+# Helper to parse raw copied lead text with robust multi-line field support
 def parse_raw_lead_text(raw_text: str) -> dict:
     if not raw_text or not raw_text.strip():
         return {}
-    parsed = {}
+    
+    key_patterns = {
+        'name': ['name', 'lead name', 'full name', 'contact name'],
+        'email': ['email', 'business email', 'work email', 'mail'],
+        'phone': ['phone', 'phone number', 'mobile', 'cell', 'tel'],
+        'company': ['company', 'enterprise', 'organization', 'target company', 'firm'],
+        'country': ['country', 'region', 'location'],
+        'interests': ['interest', 'interests', 'stated interest', 'stated interests', 'callback request', 'product/service'],
+        'message': ['message', 'inbound message', 'inquiry', 'requirement', 'requirements', 'note', 'notes', 'comments'],
+        'website': ['website', 'domain', 'company url', 'site'],
+        'page_url': ['page url', 'page', 'form url', 'referral url']
+    }
+
+    def identify_key(k_str: str):
+        clean_k = re.sub(r'[\U00010000-\U0010ffff\u2600-\u26ff\u2700-\u27bf]', '', str(k_str)).strip().lower()
+        clean_k = re.sub(r'[:\t]+$', '', clean_k).strip()
+        if not clean_k or 'validity' in clean_k:
+            return None
+        for canonical, aliases in key_patterns.items():
+            for alias in aliases:
+                if clean_k == alias or clean_k.startswith(alias + ' ') or clean_k.endswith(' ' + alias):
+                    return canonical
+        return None
+
     lines = raw_text.strip().split('\n')
-    clean_lines = []
+    extracted = {}
+    current_key = None
+
     for line in lines:
-        cleaned = re.sub(r'[\U00010000-\U0010ffff\u2600-\u26ff\u2700-\u27bf]', '', line).strip()
-        if cleaned:
-            clean_lines.append(cleaned)
-    for line in clean_lines:
-        key, val = '', ''
-        if '\t' in line:
-            parts = [p.strip() for p in line.split('\t') if p.strip()]
-            if len(parts) >= 2:
-                key, val = parts[0], '\t'.join(parts[1:])
-            elif len(parts) == 1 and ':' in parts[0]:
-                k, v = parts[0].split(':', 1)
-                key, val = k.strip(), v.strip()
-        elif ':' in line:
-            k, v = line.split(':', 1)
-            key, val = k.strip(), v.strip()
-        elif '  ' in line:
-            parts = [p.strip() for p in line.split('  ') if p.strip()]
-            if len(parts) >= 2:
-                key, val = parts[0], parts[1]
-        k_lower = key.lower()
-        if not key or not val:
+        raw_line = line.rstrip()
+        if not raw_line.strip():
+            if current_key and current_key in extracted and extracted[current_key]:
+                extracted[current_key].append('')
             continue
-        if 'name' in k_lower and 'company' not in k_lower:
-            parsed['name'] = val
-        elif 'email' in k_lower and 'validity' not in k_lower:
-            parsed['email'] = val
-        elif 'phone' in k_lower or 'mobile' in k_lower:
-            parsed['phone'] = val
-        elif 'company' in k_lower or 'enterprise' in k_lower:
-            parsed['company'] = val
-        elif 'country' in k_lower or 'region' in k_lower:
-            parsed['country'] = val
-        elif 'interest' in k_lower:
-            parsed['interests'] = val
-        elif 'message' in k_lower or 'requirement' in k_lower or 'note' in k_lower:
-            parsed['message'] = val
-        elif 'url' in k_lower or 'website' in k_lower or 'domain' in k_lower:
-            if 'linkedin' not in k_lower and 'blackridge' not in val:
-                parsed['website'] = val
+
+        matched_key = None
+        val_part = ""
+
+        # 1. Tab separated (e.g. 👤 Name\tGabriel Martinez or 💬 Message\tGreetings,)
+        if '\t' in raw_line:
+            parts = raw_line.split('\t', 1)
+            k_id = identify_key(parts[0])
+            if k_id:
+                matched_key = k_id
+                val_part = parts[1].strip() if len(parts) > 1 else ""
+
+        # 2. Colon separated (e.g. Message: Greetings...)
+        if not matched_key and ':' in raw_line:
+            parts = raw_line.split(':', 1)
+            k_candidate = parts[0].strip()
+            # Avoid matching inside timestamps like 08:30 p.m. or URLs like https://
+            if len(k_candidate.split()) <= 4 and not k_candidate.lower().startswith(('http', 'https', 'time', 'date', 'timezone')):
+                k_id = identify_key(k_candidate)
+                if k_id:
+                    matched_key = k_id
+                    val_part = parts[1].strip() if len(parts) > 1 else ""
+
+        # 3. Multiple spaces separated (e.g. Name   Gabriel Martinez)
+        if not matched_key and '  ' in raw_line:
+            parts = re.split(r'\s{2,}', raw_line, maxsplit=1)
+            if len(parts) >= 2:
+                k_id = identify_key(parts[0])
+                if k_id:
+                    matched_key = k_id
+                    val_part = parts[1].strip()
+
+        if matched_key:
+            current_key = matched_key
+            if current_key not in extracted:
+                extracted[current_key] = []
+            if val_part:
+                extracted[current_key].append(val_part)
+        elif current_key:
+            # Continuation line of current multi-line field (e.g. body paragraphs of the message)
+            cleaned_continuation = re.sub(r'[\U00010000-\U0010ffff\u2600-\u26ff\u2700-\u27bf]', '', raw_line).strip()
+            if cleaned_continuation.lower().startswith(('time\t', 'time:', 'email validity', 'validity\t', 'validity:')):
+                current_key = None
+            else:
+                extracted[current_key].append(raw_line.strip())
+
+    parsed = {}
+    for k, v_list in extracted.items():
+        joined_val = "\n".join([v for v in v_list if v is not None]).strip()
+        if joined_val:
+            parsed[k] = joined_val
+
     if not parsed.get('website') and parsed.get('email') and '@' in parsed.get('email'):
         domain = parsed['email'].split('@')[-1].lower()
-        if domain not in ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com']:
+        if domain not in ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com']:
             parsed['website'] = f'https://www.{domain}'
+
     return parsed
 
 # App State
