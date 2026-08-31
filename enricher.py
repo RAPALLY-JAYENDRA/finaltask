@@ -36,6 +36,11 @@ def is_safe_url(url: str) -> bool:
 from client_utils import call_cloudflare_worker_endpoint, model_validate_compat, model_dump_compat
 from search_client import _call_search_api, normalize_url, is_valid_linkedin_url, sanitize_search_input
 from linkedin_resolver import clean_company_name
+try:
+    from service_catalog import ServiceCatalog
+    _catalog_instance = ServiceCatalog()
+except Exception as _sc_err:
+    _catalog_instance = None
 
 logger = logging.getLogger(__name__)
 
@@ -1372,6 +1377,45 @@ Output raw JSON only. No markdown code blocks. No preamble. No trailing text."""
         is_wind = any(k in raw_inq_lower or k in company_full_text for k in ["wind power", "offshore wind", "turbine", "vestas", "orsted"])
         is_grid_power = any(k in raw_inq_lower or k in company_full_text for k in ["transmission", "substation", "grid", "distribution", "hvdc", "power gen"])
 
+        # 1. First attempt dynamic Vector Embedding retrieval over catalog_embeddings.npz (462 offerings)
+        if not matched or len(matched) == 0:
+            if _catalog_instance and _catalog_instance.vectors is not None:
+                try:
+                    c_name_query = lead_input.get("company", "") or "Target Enterprise"
+                    c_details = {
+                        "company_name": c_name_query,
+                        "industry_focus": f"{raw_inquiry} {company_search_text[:600]}",
+                        "executive_profile_analysis": response_json.get("company_profile", "") or company_search_text[:1200],
+                        "business_model_and_revenue_drivers": f"{lead_input.get('message', '')} {lead_input.get('interests', '')}",
+                        "archetype": "Enterprise",
+                        "portfolio_target_sectors": [],
+                        "delivered_historical_projects": [],
+                        "future_roadmaps_and_expansion": []
+                    }
+                    emb_res = _catalog_instance.embed_company(c_details, scraped_text=company_search_text, client_inquiry=lead_input.get("message", ""))
+                    v_cands = _catalog_instance.retrieve_candidate_hypotheses(
+                        emb_res["vector"],
+                        company_text=f"{c_name_query} {company_search_text[:2000]}",
+                        client_inquiry=lead_input.get("message", ""),
+                        top_k=5
+                    )
+                    if v_cands and len(v_cands) > 0:
+                        v_matched = []
+                        for vc in v_cands[:4]:
+                            vc_name = vc.get("canonical_name") or vc.get("primary_sector")
+                            vc_def = vc.get("definition", "")
+                            vc_slug = re.sub(r'[^a-zA-Z0-9]+', '-', vc_name.lower()).strip('-')
+                            v_matched.append({
+                                "product_name": vc_name,
+                                "url": f"https://www.blackridgeresearch.com/project-database/{vc_slug}",
+                                "relevance_summary": f"{vc_def} Directly resolves project visibility and procurement requirements for {c_name_query}."
+                            })
+                        if v_matched:
+                            matched = v_matched
+                except Exception as _v_err:
+                    logger.warning(f"Vector embeddings matching failed, falling back to sector alignment: {_v_err}")
+
+        # 2. Sector-aligned fallback if vector index is unavailable
         if not matched or len(matched) == 0:
             if is_oil_gas:
                 matched = [
