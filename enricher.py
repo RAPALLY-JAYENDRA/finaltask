@@ -1364,7 +1364,7 @@ Output raw JSON only. No markdown code blocks. No preamble. No trailing text."""
 
         # Multi-Signal Sector & Industry Alignment Engine (Message + Company Context)
         raw_inq_lower = raw_inquiry.lower()
-        company_full_text = f"{lead_input.get('company', '')} {company_search_text} {final_company_profile} {str(observed_industries)} {str(observed_technologies)}".lower()
+        company_full_text = f"{lead_input.get('company', '')} {company_search_text} {response_json.get('company_profile', '')}".lower()
 
         is_oil_gas = any(k in raw_inq_lower or k in company_full_text for k in ["oil", "gas", "petroleum", "oilfield", "pipeline", "wellhead", "christmas tree", "manifold", "valve", "flow control", "bop", "blowout preventer", "parveen"])
         is_data_center = any(k in raw_inq_lower or k in company_full_text for k in ["data center", "datacenter", "cooling", "thermal", "ups", "vertiv", "schneider", "eaton"])
