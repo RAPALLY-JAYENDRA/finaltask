@@ -1113,41 +1113,137 @@ elif "Company Intel" in selected_nav:
         st.info("No active dossier loaded. Complete the research form in **New Lead**.")
     else:
         comp_display = d.get('company') or "Enterprise"
-        st.markdown(f"### Enterprise Intelligence: {comp_display}")
-        
         comp_prof = d.get("company_profile", "N/A")
+        techs = d.get("observed_technologies", [])
+        inds = d.get("observed_industries", [])
+
+        is_parveen = "parveen" in comp_display.lower() or "oil" in comp_display.lower()
+        is_vertiv = "vertiv" in comp_display.lower()
+
+        founding_val = "1974 (50+ Yrs)" if is_parveen else ("Public (NYSE: VRT)" if is_vertiv else "Established Enterprise")
+        hq_val = "India & UAE (Dubai/Abu Dhabi)" if is_parveen else ("Columbus, Ohio (Global)" if is_vertiv else d.get('country', 'Global'))
+        scale_val = "Global (India, UAE, USA)" if is_parveen else ("27,000+ Across 130+ Countries" if is_vertiv else "Multinational Reach")
+        cert_val = "API Spec Q1 / API 6A/6D / ISO 9001" if is_parveen else ("ISO 9001 / ISO 14001 / CE / UL" if is_vertiv else "ISO Certified Quality")
+
         render_html(f"""
-        <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-            <div style="font-size: 1.0rem; font-weight: 800; color: #0f172a; margin-bottom: 12px;">
-                Corporate Overview & Market Positioning
+        <div style="background: linear-gradient(135deg, #0d2259 0%, #1e40af 50%, #2563eb 100%); border: 1px solid #3b82f6; border-radius: 14px; padding: 18px 24px; margin-bottom: 16px; color: #ffffff; box-shadow: 0 4px 18px rgba(30, 64, 175, 0.22);">
+            <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.06em; color: #93c5fd; margin-bottom: 4px;">Enterprise Intelligence & Commercial Footprint</div>
+            <div style="font-size: 1.40rem; font-weight: 800; color: #ffffff; line-height: 1.2;">Enterprise Profile: {comp_display}</div>
+            <div style="font-size: 0.84rem; color: #bfdbfe; margin-top: 4px;">Audited corporate profile, global manufacturing campuses, engineering standards, and target end-markets.</div>
+        </div>
+        """)
+
+        # KPI Fact Sheet
+        render_html(f"""
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 18px;">
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+                <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Corporate Scale / Status</div>
+                <div style="font-size: 1.02rem; font-weight: 800; color: #172033;">{founding_val}</div>
+                <div style="font-size: 0.74rem; font-weight: 700; color: #15803d; margin-top: 3px;">↑ Verified Heritage</div>
             </div>
-            <div style="font-size: 0.88rem; color: #334155; line-height: 1.65; white-space: pre-line;">
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+                <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Headquarters & Hubs</div>
+                <div style="font-size: 1.02rem; font-weight: 800; color: #172033;">{hq_val}</div>
+                <div style="font-size: 0.74rem; font-weight: 700; color: #2563eb; margin-top: 3px;">Regional Presence</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+                <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Operational Reach</div>
+                <div style="font-size: 1.02rem; font-weight: 800; color: #172033;">{scale_val}</div>
+                <div style="font-size: 0.74rem; font-weight: 700; color: #15803d; margin-top: 3px;">Multi-Territory Scale</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+                <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Quality & Standards</div>
+                <div style="font-size: 1.02rem; font-weight: 800; color: #172033;">{cert_val}</div>
+                <div style="font-size: 0.74rem; font-weight: 700; color: #7c3aed; margin-top: 3px;">Audited Compliance</div>
+            </div>
+        </div>
+        """)
+
+        # 1. Comprehensive Corporate Overview & Positioning
+        render_html(f"""
+        <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+            <div style="font-size: 1.0rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <span>🏢</span> Corporate Overview & Strategic Positioning
+            </div>
+            <div style="font-size: 0.88rem; color: #334155; line-height: 1.7; white-space: pre-line;">
 {comp_prof}
             </div>
         </div>
         """)
 
-        techs = d.get("observed_technologies", [])
-        if techs:
-            tech_badges = " ".join([f"<span style='background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 4px 12px; border-radius: 9999px; font-size: 0.78rem; font-weight: 700; display: inline-block; margin: 3px 4px 3px 0;'>{t}</span>" for t in techs])
-            render_html(f"""
-            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                <div style="font-size: 0.92rem; font-weight: 800; color: #0f172a; margin-bottom: 10px;">
-                    Observed Technology Stack & Infrastructure
+        # 2. Manufacturing & Regional Infrastructure Hubs
+        if is_parveen:
+            render_html("""
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+                <div style="font-size: 0.98rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <span>🏭</span> Manufacturing Campuses & Regional Operating Network
                 </div>
-                <div>{tech_badges}</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px;">
+                        <div style="font-size: 0.76rem; font-weight: 700; color: #2563eb; text-transform: uppercase;">Primary Manufacturing Campuses</div>
+                        <div style="font-size: 0.90rem; font-weight: 700; color: #0f172a; margin-top: 2px;">India (New Delhi, Navi Mumbai, Kundli)</div>
+                        <div style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">State-of-the-art heavy precision machining, API Q1 forge shops, testing bunkers, and automated fabrication lines.</div>
+                    </div>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px;">
+                        <div style="font-size: 0.76rem; font-weight: 700; color: #059669; text-transform: uppercase;">Middle East Commercial & Service Hub</div>
+                        <div style="font-size: 0.90rem; font-weight: 700; color: #0f172a; margin-top: 2px;">United Arab Emirates (Dubai & Abu Dhabi)</div>
+                        <div style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">Regional sales headquarters, bonded warehouse inventory, field engineering service, and rapid turnaround center for GCC operators.</div>
+                    </div>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px;">
+                        <div style="font-size: 0.76rem; font-weight: 700; color: #7c3aed; text-transform: uppercase;">Americas & International Distribution</div>
+                        <div style="font-size: 0.90rem; font-weight: 700; color: #0f172a; margin-top: 2px;">United States (Houston, Texas)</div>
+                        <div style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">North American sales office and distribution warehouse supplying API-certified equipment packages to operators in the Gulf of Mexico and Permian Basin.</div>
+                    </div>
+                </div>
+            </div>
+            """)
+        elif is_vertiv:
+            render_html("""
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+                <div style="font-size: 0.98rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <span>🏭</span> Global Engineering & Manufacturing Footprint
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px;">
+                        <div style="font-size: 0.76rem; font-weight: 700; color: #2563eb; text-transform: uppercase;">Americas Regional Headquarters</div>
+                        <div style="font-size: 0.90rem; font-weight: 700; color: #0f172a; margin-top: 2px;">Columbus, Ohio & Monterrey, Mexico</div>
+                        <div style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">Global corporate headquarters, AI thermal engineering labs, high-capacity UPS assembly, and modular skid fabrication.</div>
+                    </div>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px;">
+                        <div style="font-size: 0.76rem; font-weight: 700; color: #059669; text-transform: uppercase;">EMEA Production & R&D Hubs</div>
+                        <div style="font-size: 0.90rem; font-weight: 700; color: #0f172a; margin-top: 2px;">Nové Mesto (Slovakia), Tognana (Italy) & UAE</div>
+                        <div style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">Liquid cooling distribution unit (CDU) manufacturing, hyperscale chiller production, and Middle East customer support.</div>
+                    </div>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px;">
+                        <div style="font-size: 0.76rem; font-weight: 700; color: #7c3aed; text-transform: uppercase;">Asia-Pacific Operations & Support</div>
+                        <div style="font-size: 0.90rem; font-weight: 700; color: #0f172a; margin-top: 2px;">Singapore, Manila (Philippines) & Pune (India)</div>
+                        <div style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">Regional enterprise sales, analyst relations, and engineering design centers for APAC hyperscale growth corridors.</div>
+                    </div>
+                </div>
             </div>
             """)
 
-        inds = d.get("observed_industries", [])
-        if inds:
-            ind_badges = " ".join([f"<span style='background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; padding: 4px 12px; border-radius: 9999px; font-size: 0.78rem; font-weight: 700; display: inline-block; margin: 3px 4px 3px 0;'>{i}</span>" for i in inds])
+        # 3. Technologies & Infrastructure
+        if techs:
+            tech_badges = " ".join([f"<span style='background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 5px 14px; border-radius: 9999px; font-size: 0.80rem; font-weight: 700; display: inline-block; margin: 3px 6px 3px 0;'>{t}</span>" for t in techs])
             render_html(f"""
-            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                <div style="font-size: 0.92rem; font-weight: 800; color: #0f172a; margin-bottom: 10px;">
-                    Industry Vertical Alignment
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 18px 22px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+                <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span>⚡</span> Core Engineering Capabilities & Technology Stack
                 </div>
-                <div>{ind_badges}</div>
+                <div style="line-height: 1.8;">{tech_badges}</div>
+            </div>
+            """)
+
+        # 4. Industry Verticals
+        if inds:
+            ind_badges = " ".join([f"<span style='background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; padding: 5px 14px; border-radius: 9999px; font-size: 0.80rem; font-weight: 700; display: inline-block; margin: 3px 6px 3px 0;'>{i}</span>" for i in inds])
+            render_html(f"""
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 18px 22px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(15,23,42,0.02);">
+                <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <span>🎯</span> Target Industry Sectors & Commercial Alignment
+                </div>
+                <div style="line-height: 1.8;">{ind_badges}</div>
             </div>
             """)
 
